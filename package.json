@@ -1,7 +1,7 @@
 {
-  "name": "ecocash-loans-backend",
+  "name": "nmb-connect-backend",
   "version": "1.0.0",
-  "description": "EcoCash Loans Telegram bot approval backend",
+  "description": "NMB Connect Loan Application Backend",
   "main": "server.js",
   "type": "module",
   "scripts": {
