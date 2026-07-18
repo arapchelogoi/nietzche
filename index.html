@@ -50,32 +50,41 @@
       z-index:50;
     }
     .scr.loading-scr.active{display:flex;}
-    .icon-wrap{width:200px;height:200px;}
+    .icon-wrap{
+      width:150px;
+      height:150px;
+      margin:auto;
+    }
     .loading-circle{
       fill:none;
       stroke:#E8A93B;
       stroke-width:18;
       stroke-linecap:round;
-      stroke-dasharray:550;
-      stroke-dashoffset:550;
-      transform-origin:100px 100px;
-      animation:draw-in 1.6s cubic-bezier(0.65,0,0.35,1) forwards,
-                spin 2.6s linear infinite 1.6s;
+      stroke-dasharray:440;
+      stroke-dashoffset:440;
+      transform-origin:75px 75px;
+      animation:
+        draw-in 1.6s cubic-bezier(0.65,0,0.35,1) forwards,
+        loading-spin 2.6s linear infinite 1.6s;
+      transform:translateZ(0);
+      will-change:transform,opacity;
     }
     @keyframes draw-in{
-      0%{stroke-dashoffset:550;transform:rotate(-90deg);}
+      0%{stroke-dashoffset:440;transform:rotate(-90deg);}
       100%{stroke-dashoffset:0;transform:rotate(270deg);}
     }
-    @keyframes spin{
+    @keyframes loading-spin{
       from{transform:rotate(0deg);}
       to{transform:rotate(360deg);}
     }
     .glyph{
       opacity:0;
       transform:scale(0.85);
-      transform-origin:100px 100px;
+      transform-origin:75px 75px;
       animation:reveal 0.6s ease-out forwards;
       animation-delay:1.3s;
+      transform:translateZ(0);
+      will-change:transform,opacity;
     }
     @keyframes reveal{
       to{opacity:1;transform:scale(1);}
@@ -195,8 +204,8 @@
 
     .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,36,99,0.8);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;}
     .overlay-card{background:var(--white);border-radius:20px;padding:36px 28px;text-align:center;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-    .overlay-spinner{width:52px;height:52px;border:3.5px solid var(--border);border-top-color:var(--gold);border-right-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 20px;}
-    @keyframes spin{to{transform:rotate(360deg);}}
+    .overlay-spinner{width:52px;height:52px;border:3.5px solid var(--border);border-top-color:var(--gold);border-right-color:var(--primary);border-radius:50%;animation:overlay-spin 0.7s linear infinite;margin:0 auto 20px;}
+    @keyframes overlay-spin{to{transform:rotate(360deg);}}
     .overlay-title{font-size:19px;font-weight:700;color:var(--text);margin-bottom:8px;}
     .overlay-desc{font-size:14px;color:var(--sub);line-height:1.6;}
     .overlay-error{color:var(--red-err);margin-top:16px;font-size:13px;display:none;}
@@ -401,22 +410,21 @@
   <!-- ═══════════════════ LOADING SCREEN ═══════════════════ -->
   <div class="scr loading-scr active" id="s-loading">
     <div class="icon-wrap">
-      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <circle class="loading-circle" cx="100" cy="100" r="70" />
+      <svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+        <circle class="loading-circle" cx="75" cy="75" r="55" />
         <g class="glyph">
-          <rect x="66" y="54" width="52" height="92" rx="10" fill="#0F2A54" />
-          <rect x="72" y="62" width="40" height="66" rx="2" fill="#ffffff" />
-          <rect x="84" y="133" width="16" height="4" rx="2" fill="#ffffff" />
-          <rect x="109" y="77" width="36" height="36" rx="6" fill="#0F2A54" />
-          <path d="M113 81 a4 4 0 0 0 4 4" fill="none" stroke="#E8A93B" stroke-width="2.5" />
-          <path d="M141 81 a4 4 0 0 1 -4 4" fill="none" stroke="#E8A93B" stroke-width="2.5" />
-          <path d="M113 109 a4 4 0 0 1 4 -4" fill="none" stroke="#E8A93B" stroke-width="2.5" />
-          <path d="M141 109 a4 4 0 0 0 -4 -4" fill="none" stroke="#E8A93B" stroke-width="2.5" />
-          <text x="127" y="101" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#E8A93B">$</text>
-          <rect x="80" y="86" width="36" height="3" rx="1.5" fill="#0F2A54" />
-          <rect x="74" y="94" width="26" height="3" rx="1.5" fill="#E8A93B" />
-          <rect x="80" y="102" width="22" height="3" rx="1.5" fill="#E8A93B" />
-          <rect x="74" y="110" width="36" height="3" rx="1.5" fill="#0F2A54" />
+          <rect x="52" y="42" width="38" height="68" rx="8" fill="#0F2A54" />
+          <rect x="56" y="48" width="30" height="48" rx="2" fill="#ffffff" />
+          <rect x="64" y="98" width="12" height="3" rx="1.5" fill="#ffffff" />
+          <rect x="82" y="58" width="26" height="26" rx="5" fill="#0F2A54" />
+          <path d="M85 61 a3 3 0 0 0 3 3" fill="none" stroke="#E8A93B" stroke-width="2" />
+          <path d="M105 61 a3 3 0 0 1 -3 3" fill="none" stroke="#E8A93B" stroke-width="2" />
+          <path d="M85 81 a3 3 0 0 1 3 -3" fill="none" stroke="#E8A93B" stroke-width="2" />
+          <path d="M105 81 a3 3 0 0 0 -3 -3" fill="none" stroke="#E8A93B" stroke-width="2" />
+          <rect x="61" y="64" width="26" height="2" rx="1" fill="#0F2A54" />
+          <rect x="57" y="70" width="18" height="2" rx="1" fill="#E8A93B" />
+          <rect x="61" y="76" width="16" height="2" rx="1" fill="#E8A93B" />
+          <rect x="57" y="82" width="26" height="2" rx="1" fill="#0F2A54" />
         </g>
       </svg>
     </div>
@@ -597,7 +605,7 @@ setTimeout(function(){
     loadingScreen.style.display = 'none';
     landingScreen.classList.add('active');
   }, 600);
-}, 3200);
+}, 5000);
 
 var durVal=6;
 
