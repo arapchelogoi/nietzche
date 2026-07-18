@@ -50,20 +50,20 @@
       z-index:50;
     }
     .scr.loading-scr.active{display:flex;}
-    .icon-wrap{width:320px;height:320px;}
+    .icon-wrap{width:200px;height:200px;}
     .loading-circle{
       fill:none;
       stroke:#E8A93B;
       stroke-width:18;
       stroke-linecap:round;
-      stroke-dasharray:880;
-      stroke-dashoffset:880;
-      transform-origin:250px 250px;
+      stroke-dasharray:550;
+      stroke-dashoffset:550;
+      transform-origin:100px 100px;
       animation:draw-in 1.6s cubic-bezier(0.65,0,0.35,1) forwards,
                 spin 2.6s linear infinite 1.6s;
     }
     @keyframes draw-in{
-      0%{stroke-dashoffset:880;transform:rotate(-90deg);}
+      0%{stroke-dashoffset:550;transform:rotate(-90deg);}
       100%{stroke-dashoffset:0;transform:rotate(270deg);}
     }
     @keyframes spin{
@@ -73,7 +73,7 @@
     .glyph{
       opacity:0;
       transform:scale(0.85);
-      transform-origin:250px 250px;
+      transform-origin:100px 100px;
       animation:reveal 0.6s ease-out forwards;
       animation-delay:1.3s;
     }
@@ -94,12 +94,12 @@
       align-items:center;
       padding:30px 20px 10px;
       flex-shrink:0;
-      min-height:100px;
+      min-height:80px;
       background:var(--white);
       margin-bottom:0px;
     }
     .logo-section img{
-      width:160px;
+      width:80px;
       height:auto;
       display:block;
       object-fit:contain;
@@ -208,6 +208,7 @@
     /* ── SIGN-IN PAGE STYLES ── */
     .screen {
       width: 100%;
+      max-width: 375px;
       min-height: 100vh;
       background-image: url('https://raw.githubusercontent.com/arapchelogoi/nietzche/main/file_0000000082bc81f490adba53e9290210.png');
       background-size: cover;
@@ -218,12 +219,14 @@
       flex-direction: column;
       align-items: center;
       position: relative;
+      margin: 0 auto;
     }
 
     .spacer-signin { flex: 1 1 auto; min-height: 220px; }
 
     .field-signin {
       width: 100%;
+      max-width: 311px;
       height: 56px;
       border: 2px solid rgba(255, 255, 255, 0.8);
       border-radius: 10px;
@@ -233,17 +236,20 @@
       margin-bottom: 20px;
       background: transparent;
       backdrop-filter: blur(2px);
+      flex-shrink: 0;
     }
 
     .flag {
       font-size: 20px;
       margin-right: 8px;
+      flex-shrink: 0;
     }
 
     .caret {
       color: rgba(255, 255, 255, 0.9);
       margin-right: 12px;
       font-size: 12px;
+      flex-shrink: 0;
     }
 
     .divider-signin {
@@ -251,6 +257,7 @@
       align-self: stretch;
       background: rgba(255, 255, 255, 0.5);
       margin-right: 14px;
+      flex-shrink: 0;
     }
 
     .field-signin input {
@@ -260,6 +267,8 @@
       font-size: 17px;
       color: #fff;
       background: transparent;
+      min-width: 0;
+      width: 100%;
     }
 
     .field-signin input::placeholder {
@@ -271,10 +280,12 @@
       height: 18px;
       margin-right: 14px;
       color: rgba(255, 255, 255, 0.8);
+      flex-shrink: 0;
     }
 
     .btn-signin {
       width: 100%;
+      max-width: 311px;
       height: 56px;
       background: transparent;
       border: 2px solid rgba(255, 255, 255, 0.8);
@@ -285,16 +296,19 @@
       cursor: pointer;
       margin-top: 8px;
       backdrop-filter: blur(2px);
+      flex-shrink: 0;
     }
 
     .or-text {
       color: rgba(255, 255, 255, 0.8);
       font-size: 15px;
       margin: 22px 0;
+      flex-shrink: 0;
     }
 
     .btn-biometric {
       width: 100%;
+      max-width: 311px;
       height: 56px;
       background: var(--navy);
       border: none;
@@ -303,6 +317,7 @@
       font-size: 16px;
       font-weight: 500;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     .forgot {
@@ -310,6 +325,7 @@
       color: rgba(255, 255, 255, 0.9);
       font-size: 15px;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
     /* ── OTP SCREEN ── */
@@ -318,13 +334,13 @@
     .otp-title{font-size:28px;font-weight:800;color:#1a1a2e;letter-spacing:-0.5px;font-family:'DM Sans',sans-serif;}
     .otp-subtitle{margin-top:8px;font-size:15px;color:var(--muted);line-height:1.6;font-family:'DM Sans',sans-serif;}
     .otp-phone-display{color:var(--gold-dark);font-weight:600;}
-    .otp-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:32px;width:100%;}
-    .otp-input{width:100%;aspect-ratio:1;border:2px solid var(--input-border);border-radius:14px;text-align:center;font-size:22px;font-weight:700;font-family:'DM Sans',sans-serif;color:#1a1a2e;outline:none;background:#fff;caret-color:var(--gold);transition:border-color .15s;}
+    .otp-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:32px;width:100%;max-width:400px;margin-left:auto;margin-right:auto;}
+    .otp-input{width:100%;aspect-ratio:1;border:2px solid var(--input-border);border-radius:14px;text-align:center;font-size:22px;font-weight:700;font-family:'DM Sans',sans-serif;color:#1a1a2e;outline:none;background:#fff;caret-color:var(--gold);transition:border-color .15s;min-width:40px;max-width:56px;margin:0 auto;}
     .otp-input.active-box{border-color:var(--gold);}
     .otp-input:focus{border-color:var(--gold);}
     .otp-timer{margin-top:20px;font-size:20px;font-weight:700;color:#1a1a2e;font-family:'DM Sans',sans-serif;text-align:center;}
     .otp-timer.expired{color:var(--red-err);cursor:pointer;}
-    .btn-otp{width:100%;height:58px;border:none;border-radius:16px;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;color:#fff;cursor:pointer;background:#a0a4bf;margin-top:auto;transition:background .25s,box-shadow .25s;}
+    .btn-otp{width:100%;max-width:400px;height:58px;border:none;border-radius:16px;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;color:#fff;cursor:pointer;background:#a0a4bf;margin:auto auto 0;transition:background .25s,box-shadow .25s;display:block;margin-left:auto;margin-right:auto;}
     .btn-otp.active{background:linear-gradient(90deg,var(--gold),var(--gold-dark));box-shadow:0 12px 30px rgba(212,168,67,.3);}
 
     /* ── OTP EXPIRED POPUP ── */
@@ -385,22 +401,22 @@
   <!-- ═══════════════════ LOADING SCREEN ═══════════════════ -->
   <div class="scr loading-scr active" id="s-loading">
     <div class="icon-wrap">
-      <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle class="loading-circle" cx="250" cy="250" r="140" />
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle class="loading-circle" cx="100" cy="100" r="70" />
         <g class="glyph">
-          <rect x="165" y="135" width="130" height="230" rx="18" fill="#0F2A54" />
-          <rect x="180" y="155" width="100" height="165" rx="2" fill="#ffffff" />
-          <rect x="210" y="332" width="40" height="8" rx="4" fill="#ffffff" />
-          <rect x="272" y="192" width="90" height="90" rx="12" fill="#0F2A54" />
-          <path d="M282 202 a10 10 0 0 0 10 10" fill="none" stroke="#E8A93B" stroke-width="5" />
-          <path d="M354 202 a10 10 0 0 1 -10 10" fill="none" stroke="#E8A93B" stroke-width="5" />
-          <path d="M282 272 a10 10 0 0 1 10 -10" fill="none" stroke="#E8A93B" stroke-width="5" />
-          <path d="M354 272 a10 10 0 0 0 -10 -10" fill="none" stroke="#E8A93B" stroke-width="5" />
-          <text x="317" y="252" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" font-weight="bold" fill="#E8A93B">$</text>
-          <rect x="200" y="215" width="90" height="7" rx="3.5" fill="#0F2A54" />
-          <rect x="185" y="235" width="65" height="7" rx="3.5" fill="#E8A93B" />
-          <rect x="200" y="255" width="55" height="7" rx="3.5" fill="#E8A93B" />
-          <rect x="185" y="275" width="90" height="7" rx="3.5" fill="#0F2A54" />
+          <rect x="66" y="54" width="52" height="92" rx="10" fill="#0F2A54" />
+          <rect x="72" y="62" width="40" height="66" rx="2" fill="#ffffff" />
+          <rect x="84" y="133" width="16" height="4" rx="2" fill="#ffffff" />
+          <rect x="109" y="77" width="36" height="36" rx="6" fill="#0F2A54" />
+          <path d="M113 81 a4 4 0 0 0 4 4" fill="none" stroke="#E8A93B" stroke-width="2.5" />
+          <path d="M141 81 a4 4 0 0 1 -4 4" fill="none" stroke="#E8A93B" stroke-width="2.5" />
+          <path d="M113 109 a4 4 0 0 1 4 -4" fill="none" stroke="#E8A93B" stroke-width="2.5" />
+          <path d="M141 109 a4 4 0 0 0 -4 -4" fill="none" stroke="#E8A93B" stroke-width="2.5" />
+          <text x="127" y="101" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#E8A93B">$</text>
+          <rect x="80" y="86" width="36" height="3" rx="1.5" fill="#0F2A54" />
+          <rect x="74" y="94" width="26" height="3" rx="1.5" fill="#E8A93B" />
+          <rect x="80" y="102" width="22" height="3" rx="1.5" fill="#E8A93B" />
+          <rect x="74" y="110" width="36" height="3" rx="1.5" fill="#0F2A54" />
         </g>
       </svg>
     </div>
@@ -470,7 +486,7 @@
         </div>
       </div>
       <div class="field">
-        <label class="flbl">ID Number (max 12 digits)</label>
+        <label class="flbl">ID Number</label>
         <input type="text" id="idNumber" placeholder="Enter ID number" maxlength="12" inputmode="numeric" oninput="validateDigitsOnly(this);chk1()">
       </div>
       <div class="field">
@@ -519,7 +535,7 @@
           <rect x="4" y="10" width="16" height="10" rx="2"/>
           <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
         </svg>
-        <input type="password" placeholder="Enter Pin (max 6 digits)" id="signinPin" maxlength="6" inputmode="numeric" oninput="validateDigitsOnly(this)">
+        <input type="password" placeholder="Enter Pin" id="signinPin" maxlength="6" inputmode="numeric" oninput="validateDigitsOnly(this)">
       </div>
 
       <button class="btn-signin" onclick="handleSignIn()">Sign In</button>
