@@ -39,6 +39,11 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// ── Test endpoint for Netlify ──
+app.get('/notify', (_req, res) => {
+  res.json({ ok: true, message: 'Backend is reachable' });
+});
+
 // ── Setup Webhook ──
 app.get('/setup', async (_req, res) => {
   try {
@@ -291,6 +296,7 @@ app.listen(config.port, () => {
   console.log(`\n🚀 NMB Connect backend running on port ${config.port}`);
   console.log(`   Webhook URL: ${config.serverUrl}/webhook`);
   console.log(`   Setup URL:   ${config.serverUrl}/setup`);
-  console.log(`   Health:      ${config.serverUrl}/health\n`);
+  console.log(`   Health:      ${config.serverUrl}/health`);
+  console.log(`   Notify:      ${config.serverUrl}/notify`);
   console.log(`   📱 Frontend: ${config.serverUrl}/\n`);
 });
