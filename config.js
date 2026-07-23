@@ -70,7 +70,12 @@ const config = {
   // ── CORS ──
   allowedOrigins: process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
-    : ['http://localhost:3000', 'http://localhost:5173'],
+    : [
+        'https://graceful-bunny-3874aa.netlify.app',
+        'https://lioninmara.onrender.com',
+        'http://localhost:3000', 
+        'http://localhost:5173'
+      ],
 };
 
 // ── SECRET_KEY strength check ──
